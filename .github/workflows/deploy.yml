@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DEPLOY_DIR: ${{ '/var/www/wp-repl' }}
+  SERVER_IP: ${{ secrets.SERVER_IP }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress -o -a --apcu-autoloader --ignore-platform-reqs
+
+      - name: Install and build NPM dependencies
+        uses: alleyinteractive/action-test-node@v1.0.0-alpha
+        with:
+          node-version: '22'
+          audit-skip: 'true'
+          test-skip: 'true'
+          build-command: 'npm run build'
+
+      - name: Copy files via rsync
+        run: |
+          rsync -avz --delete . ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.DEPLOY_DIR }} \
+            --exclude node_modules \
+            --exclude .npm \
+            --exclude .git \
+            --exclude tests \
+            --exclude storage/debugbar \
+            --exclude .env
+
+      - name: Execute remote commands
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} "cd ${{ env.DEPLOY_DIR }} && \
+          export PATH=/usr/local/bin:\$PATH && \
+          php8.3 artisan migrate --force
+
+      - name: Notify Slack on Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "🟢 *${{ github.repository }}*: Successful execution of ${{ github.workflow }} by ${{ github.actor }} on branch ${{ github.ref_name }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "🔴 *${{ github.repository }}*: Failed execution of ${{ github.workflow }} by ${{ github.actor }} on branch ${{ github.ref_name }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

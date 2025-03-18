@@ -32,13 +32,6 @@ require_once 'wordpress/wp-load.php';
 
 // Output a simple message to the browser.
 echo "Hello, World!";
-
-// You can also use WordPress functions like get_option() to retrieve
-// options or wp_insert_post() to create posts. For example:
-//
-//   echo get_option('blogname');
-//
-//   wp_insert_post(['post_title' => 'Hello World', 'post_content' => 'This is a test post.']);
 `;
 
 export type PlaygroundContextType = {

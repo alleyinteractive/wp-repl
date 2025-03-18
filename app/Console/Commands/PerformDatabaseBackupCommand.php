@@ -30,9 +30,9 @@ final class PerformDatabaseBackupCommand extends Command
     {
         $filename = 'backup-'.now()->timestamp.'.sql';
 
-        File::copy(database_path('database.sqlite'), database_path('backups/'.$filename));
+        File::copy(database_path('database.sqlite'), storage_path('backups/'.$filename));
 
-        $glob = File::glob(database_path('backups/*.sql'));
+        $glob = File::glob(storage_path('storage/backups/*.sql'));
 
         collect($glob)->sort()->reverse()->slice(4)->filter(
             fn (mixed $backup): bool => is_string($backup),

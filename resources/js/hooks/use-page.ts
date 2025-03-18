@@ -8,7 +8,6 @@ export type ShareType = {
 };
 
 export type PageProps = {
-    created?: boolean;
     /* https://github.com/spatie/laravel-honeypot */
     honeypot: {
         enabled: boolean;

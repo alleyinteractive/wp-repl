@@ -5,12 +5,12 @@ import { useState } from 'react';
 
 export function SharePopover() {
     const [copied, setCopied] = useState(false);
-    const {
-        props: { created = false, url = '' },
-    } = usePage();
-    const [show, setShow] = useState(true); // created
+    const { url, props: { url: shareUrl } } = usePage();
+    const [show, setShow] = useState(true);
 
-    if (!created) {
+    const created = url.includes('created=1');
+
+    if (!created || !shareUrl) {
         return null;
     }
 
@@ -28,14 +28,14 @@ export function SharePopover() {
                                             autoFocus
                                             readOnly
                                             type="text"
-                                            value={url}
+                                            value={shareUrl}
                                             className="w-full rounded-md border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-300"
                                         />
                                         <button
                                             type="button"
                                             className="rounded-md bg-white text-sm font-medium text-blue-600 hover:text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:bg-transparent dark:text-gray-100"
                                             onClick={() => {
-                                                navigator.clipboard.writeText(url).then(() => {
+                                                navigator.clipboard.writeText(shareUrl).then(() => {
                                                     setCopied(true);
                                                     setTimeout(() => setCopied(false), 2000);
                                                 });

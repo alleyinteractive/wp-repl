@@ -50,7 +50,7 @@ export type PlaygroundContextType = {
 export const defaultState: PlaygroundContextType = {
     code: DEFAULT_CODE,
     consoleShowing: false,
-    browserShowing: true,
+    browserShowing: false,
     error: undefined,
     executionTime: undefined,
     output: undefined,

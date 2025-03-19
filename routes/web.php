@@ -8,4 +8,4 @@ Route::get('/', [ShareController::class, 'index'])->name('home');
 Route::post('/share', [ShareController::class, 'store'])
     ->name('share.store')
     ->middleware(ProtectAgainstSpam::class);
-Route::get('/share/{share:hash}', [ShareController::class, 'show'])->name('share.show');
+Route::get('/{share:hash}', [ShareController::class, 'show'])->name('share.show');

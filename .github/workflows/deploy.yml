@@ -57,7 +57,7 @@ jobs:
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} "cd ${{ env.DEPLOY_DIR }} && \
           export PATH=/usr/local/bin:\$PATH && \
           php8.3 artisan migrate --force && \
-          php8.3 artisan optimize"
+          php8.3 artisan optimize:clear && php8.3 artisan optimize"
 
       - name: Notify Slack on Success
         if: success()

@@ -34,7 +34,7 @@ final class PerformDatabaseBackupCommand extends Command
 
         $glob = File::glob(storage_path('storage/backups/*.sql'));
 
-        collect($glob)->sort()->reverse()->slice(4)->filter(
+        collect($glob)->sort()->reverse()->slice(5)->filter(
             fn (mixed $backup): bool => is_string($backup),
         )
             ->each(

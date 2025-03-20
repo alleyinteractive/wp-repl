@@ -1,16 +1,25 @@
 import { usePage } from '@/hooks/use-page';
 import { Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/20/solid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function SharePopover() {
     const [copied, setCopied] = useState(false);
-    const { url, props: { url: shareUrl } } = usePage();
-    const [show, setShow] = useState(true);
+    const {
+        props: { url: shareUrl },
+    } = usePage();
+    const [show, setShow] = useState(false);
+    const created = localStorage?.getItem('created') === 'true';
 
-    const created = url.includes('created=1');
+    // Remove the created flag from localStorage when the component mounts.
+    useEffect(() => {
+        if (created) {
+            localStorage?.removeItem('created');
+            setShow(true);
+        }
+    }, [created]);
 
-    if (!created || !shareUrl) {
+    if (!show || !shareUrl) {
         return null;
     }
 
@@ -18,13 +27,7 @@ export function SharePopover() {
         <div aria-live="assertive" className="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6">
             <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
                 <Transition show={show}>
-                    <div className="
-                        pointer-events-auto
-                        w-full max-w-sm overflow-hidden
-                        bg-white dark:bg-gray-400 dark:ring-gray-900/20
-                        rounded-lg
-                        shadow-lg ring-1 ring-black/5 transition
-                        data-[closed]:opacity-0 data-[enter]:transform data-[enter]:duration-300 data-[enter]:ease-out data-[closed]:data-[enter]:translate-y-2 data-[leave]:duration-100 data-[leave]:ease-in data-[closed]:data-[enter]:sm:translate-x-2 data-[closed]:data-[enter]:sm:translate-y-0 ">
+                    <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5 transition data-[closed]:opacity-0 data-[enter]:transform data-[enter]:duration-300 data-[enter]:ease-out data-[closed]:data-[enter]:translate-y-2 data-[leave]:duration-100 data-[leave]:ease-in data-[closed]:data-[enter]:sm:translate-x-2 data-[closed]:data-[enter]:sm:translate-y-0 dark:bg-gray-400 dark:ring-gray-900/20">
                         <div className="p-4">
                             <div className="flex items-start">
                                 <div className="ml-3 w-0 flex-1 pt-0.5">

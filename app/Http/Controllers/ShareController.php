@@ -26,7 +26,7 @@ class ShareController extends Controller
         $share = new Share($validated);
         $share->save();
 
-        return redirect()->route('share.show', ['share' => $share, 'created' => true]);
+        return redirect()->route('share.show', ['share' => $share]);
     }
 
     public function show(Share $share, Honeypot $honeypot)

@@ -60,6 +60,13 @@ jobs:
           php8.3 artisan migrate --force && \
           php8.3 artisan optimize:clear && php8.3 artisan optimize"
 
+      - name: Purge Cloudflare Cache
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+            --data '{"files":["https://repl.alley.dev"]}'
+
       - name: Notify Slack on Success
         if: success()
         uses: slackapi/slack-github-action@v1.26.0

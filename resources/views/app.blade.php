@@ -14,9 +14,10 @@
             property="og:description"
             content="Run PHP and WordPress code snippets instantly in your browser with this REPL for WordPress. Test, debug, and experiment with ease."
         />
-        <meta property="og:url" content="{{ url('/') }}" />
+        <meta property="og:url" content="{{ url()->current() }}" />
 
         <link rel="icon" type="image/svg+xml" href="{{ asset('image/icon.svg') }}" />
+        <link rel="canonical" href="{{ url()->current() }}" />
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>

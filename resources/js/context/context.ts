@@ -27,9 +27,6 @@ export const DEFAULT_CODE = `<?php
    -- Alley (https://alley.com/)
 */
 
-// Load WordPress to get access to its functions.
-require_once 'wordpress/wp-load.php';
-
 // Output a simple message to the browser.
 echo "Hello, World!";
 `;

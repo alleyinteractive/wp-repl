@@ -8,7 +8,6 @@ export function useRunCode() {
     } = usePlaygroundState();
 
     return async (code: string) => {
-        console.log('run code', code);
         if (!playgroundClient) {
             dispatch(actionSetError('Playground client is not initialized.'));
             dispatch(actionSetOutput(''));
@@ -21,6 +20,9 @@ export function useRunCode() {
             dispatch(actionSetOutput(''));
             return;
         }
+
+        // Inject the WordPress loader into the code.
+        code = code.replace(/<\?php/, "<?php require_once 'wordpress/wp-load.php';");
 
         try {
             const startTime = performance.now();

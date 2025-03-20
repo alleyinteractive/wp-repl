@@ -1,7 +1,7 @@
+import { useEffect, useState } from 'react';
+import { XMarkIcon } from '@heroicons/react/20/solid';
 import { usePage } from '@/hooks/use-page';
 import { Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/20/solid';
-import { useEffect, useState } from 'react';
 
 export function SharePopover() {
     const [copied, setCopied] = useState(false);

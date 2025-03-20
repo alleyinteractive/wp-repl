@@ -61,7 +61,8 @@
         "tailwindcss-animate": "^1.0.7",
         "typescript": "^5.7.2",
         "vite": "^6.0",
-        "vscode-jsonrpc": "^8.2.1"
+        "vscode-languageclient": "^9.0.1",
+        "vscode-ws-jsonrpc": "^3.4.0"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",

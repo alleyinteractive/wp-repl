@@ -9,11 +9,23 @@ const intelephense = spawn("./node_modules/intelephense/lib/intelephense.js", ["
 const wss = new WebSocket.Server({ port: 3000 });
 
 wss.on('connection', (ws) => {
-    const serverConnection = net.createConnection({ port: intelephense.pid });
+    const serverConnection = net.createConnection({ port: intelephense.pid }, () => console.log("Connected to Intelephense"));
+    // const serverConnection = net.createConnection({ port: 3000 }, () => console.log("Connected to Intelephense"));
 
     // Relay messages between WebSocket and Intelephense
     ws.on("message", (message) => serverConnection.write(message));
     serverConnection.on("data", (data) => ws.send(data));
+    ws.on("close", () => serverConnection.end());
 });
+
+// const wss = new WebSocket.Server({ port: 8080 });
+
+// wss.on("connection", (ws) => {
+//     const server = net.createConnection({ port: 3000 }, () => console.log("Connected to Intelephense"));
+
+//     ws.on("message", (message) => server.write(message));
+//     server.on("data", (data) => ws.send(data));
+//     ws.on("close", () => server.end());
+// });
 
 console.log('WebSocket server is running on ws://localhost:3000');

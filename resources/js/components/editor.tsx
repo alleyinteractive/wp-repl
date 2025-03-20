@@ -1,16 +1,67 @@
-import { default as Monaco } from '@monaco-editor/react';
-import {
-    MonacoLanguageClient,
-    CloseAction,
-    ErrorAction,
-    createConnection,
-} from "monaco-languageclient";
-import {
-    WebSocketMessageReader,
-    WebSocketMessageWriter,
-} from "vscode-jsonrpc";
-
 import { useIsDark } from '@/hooks/use-appearance';
+import { default as Monaco } from '@monaco-editor/react';
+import { MonacoLanguageClient } from 'monaco-languageclient';
+import { CloseAction, ErrorAction, MessageTransports } from 'vscode-languageclient/browser.js';
+import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc';
+
+// import { ConsoleLogger } from 'monaco-languageclient/tools';
+// import { WebSocketMessageReader, WebSocketMessageWriter, toSocket } from 'vscode-ws-jsonrpc';
+// import { configureDefaultWorkerFactory } from 'monaco-editor-wrapper/workers/workerLoaders';
+
+// import { MonacoLanguageClient, MessageTransports } from 'monaco-languageclient';
+// import { createConnection } from 'monaco-languageclient/lib/monaco';
+// import { createWebSocketAndStartServer } from 'monaco-languageclient/lib/monaco';
+
+// function createLanguageClient(transports: MessageTransports) {
+//     return new MonacoLanguageClient({
+//         name: "PHP Language Client",
+//         clientOptions: {
+//             documentSelector: ['php'],
+//             // synchronization: { didSave: true }
+//         },
+//         // @ts-expect-error does not exist
+//         connectionProvider: { get: () => Promise.resolve(transports) }
+//     });
+// }
+
+// function createWebSocketConnection(url: string) {
+//     const socket = new WebSocket(url);
+//     return createConnection(socket);
+// }
+
+/** parameterized version , support all languageId */
+export const initWebSocketAndStartClient = (url: string): WebSocket => {
+    const webSocket = new WebSocket(url);
+    webSocket.onopen = () => {
+        const socket = toSocket(webSocket);
+        const reader = new WebSocketMessageReader(socket);
+        const writer = new WebSocketMessageWriter(socket);
+        const languageClient = createLanguageClient({
+            reader,
+            writer
+        });
+        languageClient.start();
+        reader.onClose(() => languageClient.stop());
+    };
+    return webSocket;
+};
+
+export const createLanguageClient = (messageTransports: MessageTransports): MonacoLanguageClient => {
+    return new MonacoLanguageClient({
+        name: 'Sample Language Client',
+        clientOptions: {
+            // use a language id as a document selector
+            documentSelector: ['json'],
+            // disable the default error handler
+            errorHandler: {
+                error: () => ({ action: ErrorAction.Continue }),
+                closed: () => ({ action: CloseAction.DoNotRestart })
+            }
+        },
+        // create a language client connection from the JSON RPC connection on demand
+        messageTransports,
+    });
+};
 
 /**
  * Wrapper for the Monaco Editor component to create a PHP code editor.
@@ -61,7 +112,14 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
                 });
 
                 // Register PHP language support.
-                monaco.languages.register({ id: "php" });
+                monaco.languages.register({ id: 'php', extensions: ['.php'], aliases: ['PHP', 'php']});
+            }}
+            // onMount={(editor, monaco) => {
+            onMount={(editor) => {
+                initWebSocketAndStartClient("ws://localhost:3000");
+                // const transports = createWebSocketConnection("ws://localhost:3000");
+                // const languageClient = createLanguageClient(transports);
+                // languageClient.start();
             }}
             options={{
                 fixedOverflowWidgets: true,

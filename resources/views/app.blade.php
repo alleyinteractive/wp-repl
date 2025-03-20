@@ -15,6 +15,8 @@
         />
         <meta property="og:url" content="{{ url('/') }}" />
 
+        <link rel="icon" type="image/svg+xml" href="{{ asset('image/icon.svg') }}" />
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {

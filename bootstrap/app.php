@@ -19,6 +19,16 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
             RemoveCookies::class,
         ]);
+
+        // Disable sessions and CSRF for the application.
+        $middleware->removeFromGroup('web', [
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

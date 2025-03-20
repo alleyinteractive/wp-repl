@@ -1,5 +1,16 @@
-import { useIsDark } from '@/hooks/use-appearance';
 import { default as Monaco } from '@monaco-editor/react';
+import {
+    MonacoLanguageClient,
+    CloseAction,
+    ErrorAction,
+    createConnection,
+} from "monaco-languageclient";
+import {
+    WebSocketMessageReader,
+    WebSocketMessageWriter,
+} from "vscode-jsonrpc";
+
+import { useIsDark } from '@/hooks/use-appearance';
 
 /**
  * Wrapper for the Monaco Editor component to create a PHP code editor.
@@ -48,6 +59,9 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
                         'editorWhitespace.foreground': '#D9D9D9', // Light Grey - Whitespace
                     },
                 });
+
+                // Register PHP language support.
+                monaco.languages.register({ id: "php" });
             }}
             options={{
                 fixedOverflowWidgets: true,

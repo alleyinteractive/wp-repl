@@ -9,6 +9,7 @@
             content="Run PHP and WordPress code snippets instantly in your browser with this REPL for WordPress. Test, debug, and experiment with ease."
         />
         <meta property="og:title" content="REPL for WordPress" />
+        <meta property="og:image" content="{{ asset('image/og.png') }}" />
         <meta
             property="og:description"
             content="Run PHP and WordPress code snippets instantly in your browser with this REPL for WordPress. Test, debug, and experiment with ease."

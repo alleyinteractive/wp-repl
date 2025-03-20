@@ -4,6 +4,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <meta
+            name="description"
+            content="Run PHP and WordPress code snippets instantly in your browser with this REPL for WordPress. Test, debug, and experiment with ease."
+        />
+        <meta property="og:title" content="REPL for WordPress" />
+        <meta
+            property="og:description"
+            content="Run PHP and WordPress code snippets instantly in your browser with this REPL for WordPress. Test, debug, and experiment with ease."
+        />
+        <meta property="og:url" content="{{ url('/') }}" />
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {

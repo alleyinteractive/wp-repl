@@ -1,22 +1,34 @@
-import * as monaco from "monaco-editor";
+import { useEffect, useRef } from 'react';
+// import * as monaco from "monaco-editor";
 import { useIsDark } from '@/hooks/use-appearance';
-import { initLanguageServer } from '@/lib/language-server';
-import { default as Monaco, loader } from '@monaco-editor/react';
+import { runClient } from './language-server';
+// import { default as Monaco, loader } from '@monaco-editor/react';
 
 // Set the Monaco Editor loader configuration to use the monaco instance.
-loader.config({ monaco });
+// loader.config({ monaco });
 
 /**
  * Wrapper for the Monaco Editor component to create a PHP code editor.
  */
 export function Editor(props: React.ComponentProps<typeof Monaco>) {
     const isDark = useIsDark();
+    const ref = useRef<HTMLDivElement>(null);
 
     const getCssVariable = (name: string) => {
         return getComputedStyle(document.documentElement).getPropertyValue(name);
     };
 
+    useEffect(() => {
+        if (ref.current) {
+            runClient(ref.current);
+        }
+    }, [ref]);
+
     return (
+        <div ref={ref} style={{ height: '100%', width: '100%' }} className="editor-container" />
+    );
+
+    {/* return (
         <Monaco
             language="php"
             height="100%"
@@ -86,5 +98,5 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
             width="100%"
             {...props}
         />
-    );
+    ); */}
 }

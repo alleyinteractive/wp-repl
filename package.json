@@ -20,7 +20,8 @@
         "prettier": "^3.4.2",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
-        "typescript-eslint": "^8.23.0"
+        "typescript-eslint": "^8.23.0",
+        "vite-plugin-monaco-editor": "^1.1.0"
     },
     "dependencies": {
         "@fontsource/roboto": "^5.2.5",
@@ -53,6 +54,7 @@
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",
         "monaco": "^1.201704190613.0",
+        "monaco-editor-wrapper": "^6.6.0",
         "monaco-languageclient": "^9.5.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

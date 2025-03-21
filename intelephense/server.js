@@ -29,14 +29,16 @@ const wss = new WebSocketServer({ port: 3000 });
 
 wss.on('connection', (ws) => {
     console.log("Client connected");
-A
+
     const phpLsp = spawn("intelephense", ["--stdio"]);
 
     ws.on("message", (message) => {
+        console.log("Received message from client:", message);
         phpLsp.stdin.write(message);
     });
 
     phpLsp.stdout.on("data", (data) => {
+        console.log("Sending data to client:", data.toString());
         ws.send(data.toString());
     });
 

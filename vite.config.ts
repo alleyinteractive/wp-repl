@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import monacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 export default defineConfig({
     plugins: [
@@ -13,6 +14,9 @@ export default defineConfig({
         }),
         react(),
         tailwindcss(),
+        monacoEditorPlugin.default({
+            languageWorkers: ['editorWorkerService'],
+        }),
     ],
     esbuild: {
         jsx: 'automatic',

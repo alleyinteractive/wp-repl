@@ -66,13 +66,19 @@ export default function Playground() {
         } = page;
 
         startTransition(() => {
-            router.post('/share', {
-                code,
-                php_version: phpVersion,
-                wordpress_version: wordPressVersion,
-                [`${nameFieldName}`]: enabled ? '' : undefined,
-                [`${validFromFieldName}`]: enabled ? encryptedValidFrom : undefined,
-            });
+            router.post(
+                '/share',
+                {
+                    code,
+                    php_version: phpVersion,
+                    wordpress_version: wordPressVersion,
+                    [`${nameFieldName}`]: enabled ? '' : undefined,
+                    [`${validFromFieldName}`]: enabled ? encryptedValidFrom : undefined,
+                },
+                {
+                    onSuccess: () => localStorage?.setItem('created', 'true'),
+                },
+            );
         });
     };
 

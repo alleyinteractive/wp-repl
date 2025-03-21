@@ -1,19 +1,25 @@
 import { usePage } from '@/hooks/use-page';
 import { Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/20/solid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function SharePopover() {
     const [copied, setCopied] = useState(false);
     const {
-        url,
         props: { url: shareUrl },
     } = usePage();
-    const [show, setShow] = useState(true);
+    const [show, setShow] = useState(false);
+    const created = localStorage?.getItem('created') === 'true';
 
-    const created = url.includes('created=1');
+    // Remove the created flag from localStorage when the component mounts.
+    useEffect(() => {
+        if (created) {
+            localStorage?.removeItem('created');
+            setShow(true);
+        }
+    }, [created]);
 
-    if (!created || !shareUrl) {
+    if (!show || !shareUrl) {
         return null;
     }
 

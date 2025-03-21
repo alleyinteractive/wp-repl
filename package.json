@@ -52,6 +52,7 @@
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",
+        "monaco": "^1.201704190613.0",
         "monaco-languageclient": "^9.5.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

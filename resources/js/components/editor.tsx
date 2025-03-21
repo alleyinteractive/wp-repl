@@ -1,6 +1,10 @@
+import * as monaco from "monaco-editor";
 import { useIsDark } from '@/hooks/use-appearance';
 import { initLanguageServer } from '@/lib/language-server';
-import { default as Monaco } from '@monaco-editor/react';
+import { default as Monaco, loader } from '@monaco-editor/react';
+
+// Set the Monaco Editor loader configuration to use the monaco instance.
+loader.config({ monaco });
 
 /**
  * Wrapper for the Monaco Editor component to create a PHP code editor.

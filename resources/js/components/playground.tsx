@@ -104,9 +104,11 @@ export default function Playground() {
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 shadow-xs md:px-4">
                 <div className="flex w-full items-center gap-2 break-words sm:gap-2.5">
-                    <a href="/" className="text-foreground hover:text-foreground/80 text-lg">
-                        REPL for WordPress
-                    </a>
+                    <h1>
+                        <a href="/" className="text-foreground hover:text-foreground/80 text-lg">
+                            REPL for WordPress
+                        </a>
+                    </h1>
 
                     <div className="ml-auto hidden flex-row items-center gap-2 md:flex">
                         <span className="text-foreground/80 mr-2 text-sm">

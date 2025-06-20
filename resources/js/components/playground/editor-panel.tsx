@@ -71,6 +71,7 @@ export function EditorPanel() {
                         'bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-500': !isDark,
                     })}
                     type="submit"
+                    data-testid="run-code-button"
                 >
                     Run (ctrl + enter)
                 </button>

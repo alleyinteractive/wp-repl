@@ -1,1 +1,1 @@
-export const DEFAULT_PHP_VERSION = '8.2';
+export const DEFAULT_PHP_VERSION = '8.3';

@@ -25,8 +25,21 @@ jobs:
         composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
         npm install
 
-    - name: Install dependencies
-      run: npm ci
+    - name: Install dependencies and build
+      run: npm ci && npm run build
+
+    - name: Start server
+      run: |
+        php artisan serve &
+
+        for i in {1..15}; do
+          if curl -s http://localhost:8000 > /dev/null; then
+            echo "Server is up!"
+            break
+          fi
+          echo "Waiting for server to start..."
+          sleep 2
+        done
 
     - name: Install Playwright Browsers
       run: npx playwright install chromium --with-deps

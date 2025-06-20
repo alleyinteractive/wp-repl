@@ -22,7 +22,7 @@ export function useRunCode() {
         }
 
         // Inject the WordPress loader into the code.
-        code = code.replace(/<\?php/, "<?php require_once 'wordpress/wp-load.php';");
+        code = code.replace(/<\?php/, "<?php require_once '/wordpress/wp-load.php';");
 
         try {
             const startTime = performance.now();

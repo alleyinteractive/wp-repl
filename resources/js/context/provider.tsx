@@ -36,6 +36,10 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             ...defaultState,
             // Use the local storage settings if they exist.
             ...getLocalStorage(),
+            // Ensure that some properties are not inherited from local storage.
+            multisite: defaultState.multisite,
+            phpVersion: defaultState.phpVersion,
+            wordPressVersion: defaultState.wordPressVersion,
             // Override with the share settings if they exist.
             ...(share
                 ? {
@@ -75,8 +79,6 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             console.error(`Playground Error: ${error}`);
         }
     }, [error]);
-
-    console.log('PlaygroundProvider: state', state);
 
     return (
         <PlaygroundStateContext.Provider value={state}>

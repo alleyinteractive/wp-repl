@@ -31,14 +31,6 @@ export default function Playground() {
 
         const setupPlayground = async () => {
             const steps: StepDefinition[] = [];
-            steps.push({
-                step: 'setSiteOptions',
-                options: {
-                    siteTitle: 'WordPress Playground',
-                    siteDescription: 'A WordPress Playground instance for testing and development.',
-                },
-            });
-
             if (multisite) {
                 steps.push({
                     step: 'enableMultisite',

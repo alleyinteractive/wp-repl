@@ -76,7 +76,7 @@ export const actionSetWordPressVersion = (wordPressVersion: PlaygroundContextTyp
     payload: wordPressVersion,
 });
 
-export const actionSetState = (state: Omit<PlaygroundContextType, 'playgroundClient'>) => ({
+export const actionSetState = (state: Partial<PlaygroundContextType>) => ({
     type: SET_STATE,
     payload: state,
 });

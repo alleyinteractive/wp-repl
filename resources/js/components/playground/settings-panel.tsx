@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { actionSetMultisite, actionSetPhpVersion, actionSetSettingsOpen, actionSetWordPressVersion, PlaygroundContextType } from '@/context';
+import { actionSetSettingsOpen, actionSetState, PlaygroundContextType } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { DEFAULT_PHP_VERSION } from '@/lib/constants';
 
@@ -52,11 +52,15 @@ export function SettingsPanel() {
 
     const onClose = () => dispatch(actionSetSettingsOpen(false));
     const applySettings = () => {
-        console.log('localMultisite', localMultisite);
-        dispatch(actionSetMultisite(localMultisite));
-        dispatch(actionSetPhpVersion(localPhpVersion as SupportedPHPVersion));
-        dispatch(actionSetWordPressVersion(localWordPressVersion));
-        dispatch(actionSetSettingsOpen(false));
+        dispatch(
+            actionSetState({
+                loading: true,
+                multisite: localMultisite,
+                phpVersion: localPhpVersion as SupportedPHPVersion,
+                settingsOpen: false,
+                wordPressVersion: localWordPressVersion,
+            }),
+        );
     };
 
     return (

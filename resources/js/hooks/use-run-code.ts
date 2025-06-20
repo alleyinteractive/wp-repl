@@ -28,8 +28,20 @@ export function useRunCode() {
 
         try {
             const startTime = performance.now();
-            const response = await playgroundClient.run({ code });
+            const response = await playgroundClient.run({
+                code,
+                headers: {
+                    // Set the host header to the playground to ensure that
+                    // get_site_by_path() inside of WordPress is able to find
+                    // the site properly.
+                    host: 'playground.wordpress.net:443',
+                },
+            });
             const endTime = performance.now();
+
+            if (response.httpStatusCode !== 200) {
+                console.log('Potential error in response', response);
+            }
 
             dispatch(actionSetOutput(response.text));
             dispatch(actionSetExecutionTime(endTime - startTime));

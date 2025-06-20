@@ -23,6 +23,8 @@ jobs:
     - name: Install Dependencies
       run: |
         composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        cp .env.example .env
+        php artisan key:generate
         npm install
 
     - name: Install dependencies and build

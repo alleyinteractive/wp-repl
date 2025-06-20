@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
  * @property string $hash
  * @property string $code
  * @property string $php_version
+ * @property bool $multisite
  * @property string $wordpress_version
  * @property array|null $options
  * @property \Illuminate\Support\Carbon|null $created_at

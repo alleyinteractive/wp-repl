@@ -37,7 +37,12 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             // Use the local storage settings if they exist.
             ...getLocalStorage(),
             // Override with the share settings if they exist.
-            ...(share ? { code: share.code, wordPressVersion: share.wordpress_version, phpVersion: share.php_version } : {}),
+            ...(share ? {
+                code: share.code,
+                multisite: share.multisite,
+                phpVersion: share.php_version,
+                wordPressVersion: share.wordpress_version,
+            } : {}),
         };
 
         dispatch(actionSetState(state));
@@ -51,9 +56,11 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
                 ...state,
                 // Avoid including specific properties but store other properties
                 // such as WordPress version, show/hide console, etc.
+                // Consider not restoring from local storage at all if this is a bad experience.
                 code: undefined,
                 output: undefined,
                 playgroundClient: undefined,
+                settingsOpen: undefined,
             }),
         );
     }, [state]);
@@ -63,6 +70,8 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             console.error(`Playground Error: ${error}`);
         }
     }, [error]);
+
+    console.log('PlaygroundProvider: state', state);
 
     return (
         <PlaygroundStateContext.Provider value={state}>

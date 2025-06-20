@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { startPlaygroundWeb } from '@wp-playground/client';
+import { startPlaygroundWeb, StepDefinition } from '@wp-playground/client';
 import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
 
@@ -21,11 +21,19 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, phpVersion, playgroundClient, wordPressVersion } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, playgroundClient, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
         const setupPlayground = async () => {
+            const steps: StepDefinition[] = [];
+
+            if (multisite) {
+                steps.push({
+                    step: 'enableMultisite',
+                });
+            }
+
             const client = await startPlaygroundWeb({
                 iframe: iframe.current!,
                 remoteUrl: 'https://playground.wordpress.net/remote.html',
@@ -38,7 +46,12 @@ export default function Playground() {
                         networking: true,
                     },
                     landingPage: '/',
-                    steps: [{ step: 'login', username: 'admin', password: 'password' }],
+                    login: {
+                        username: 'admin',
+                        password: 'password',
+                    },
+                    steps,
+                    // steps: [{ step: 'login', username: 'admin', password: 'password' }],
                 },
                 sapiName: 'cli',
             });
@@ -51,7 +64,7 @@ export default function Playground() {
         if (iframe.current) {
             setupPlayground();
         }
-    }, [dispatch, iframe, phpVersion, wordPressVersion]);
+    }, [dispatch, iframe, multisite, phpVersion, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {

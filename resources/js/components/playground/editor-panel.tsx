@@ -14,7 +14,7 @@ export function EditorPanel() {
     const run = useRunCode();
     const {
         dispatch,
-        state: { code, executionTime, phpVersion, wordPressVersion },
+        state: { code, executionTime, multisite, phpVersion, wordPressVersion },
     } = usePlaygroundState();
 
     const onSubmit = (e?: React.FormEvent) => {
@@ -61,6 +61,7 @@ export function EditorPanel() {
                         aria-label="Open settings"
                     >
                         WordPress {wordPressVersion}
+                        {multisite ? ' (Multisite)' : ''}
                     </button>
                     {executionTime ? <span className="ml-2">{executionTime.toFixed(2)} ms</span> : null}
                 </div>

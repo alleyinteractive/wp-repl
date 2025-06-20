@@ -21,10 +21,14 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, multisite, phpVersion, playgroundClient, wordPressVersion } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, playgroundClient, ready, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
+        if (!ready) {
+            return;
+        }
+
         const setupPlayground = async () => {
             const steps: StepDefinition[] = [];
 
@@ -33,6 +37,8 @@ export default function Playground() {
                     step: 'enableMultisite',
                 });
             }
+
+            console.log('steps', steps);
 
             const client = await startPlaygroundWeb({
                 iframe: iframe.current!,
@@ -64,7 +70,7 @@ export default function Playground() {
         if (iframe.current) {
             setupPlayground();
         }
-    }, [dispatch, iframe, multisite, phpVersion, wordPressVersion]);
+    }, [dispatch, iframe, multisite, phpVersion, ready, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {

@@ -20,13 +20,7 @@ export function SettingsPanel() {
 
     const {
         dispatch,
-        state: {
-            phpVersion,
-            playgroundClient,
-            wordPressVersion,
-            multisite,
-            settingsOpen: open,
-        },
+        state: { phpVersion, playgroundClient, wordPressVersion, multisite, settingsOpen: open },
     } = usePlaygroundState();
 
     useEffect(() => {

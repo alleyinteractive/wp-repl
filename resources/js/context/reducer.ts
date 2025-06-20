@@ -1,4 +1,3 @@
-import { defaultState, PlaygroundContextType } from './context';
 import {
     PlaygroundContextAction,
     RESET,
@@ -15,6 +14,7 @@ import {
     SET_STATE,
     SET_WORDPRESS_VERSION,
 } from './actions';
+import { defaultState, PlaygroundContextType } from './context';
 
 export const reducer: React.Reducer<PlaygroundContextType, PlaygroundContextAction> = (state, action) => {
     switch (action.type) {

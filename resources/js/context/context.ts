@@ -41,6 +41,7 @@ export type PlaygroundContextType = {
     output?: string;
     phpVersion: SupportedPHPVersion | 'latest';
     playgroundClient?: PlaygroundClient;
+    ready: boolean;
     settingsOpen?: boolean;
     wordPressVersion: 'latest' | 'nightly' | `${number}.${number}`;
 };
@@ -55,6 +56,7 @@ export const defaultState: PlaygroundContextType = {
     output: undefined,
     phpVersion: DEFAULT_PHP_VERSION,
     playgroundClient: undefined,
+    ready: false,
     settingsOpen: false,
     wordPressVersion: 'latest',
 };

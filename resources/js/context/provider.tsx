@@ -37,12 +37,16 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             // Use the local storage settings if they exist.
             ...getLocalStorage(),
             // Override with the share settings if they exist.
-            ...(share ? {
-                code: share.code,
-                multisite: share.multisite,
-                phpVersion: share.php_version,
-                wordPressVersion: share.wordpress_version,
-            } : {}),
+            ...(share
+                ? {
+                      code: share.code,
+                      multisite: share.multisite,
+                      phpVersion: share.php_version,
+                      wordPressVersion: share.wordpress_version,
+                  }
+                : {}),
+            // Mark the state as ready to load the playground client.
+            ready: true,
         };
 
         dispatch(actionSetState(state));

@@ -44,6 +44,6 @@ export default defineConfig({
   webServer: {
     command: 'composer run dev',
     url: 'http://localhost:8000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
   },
 });

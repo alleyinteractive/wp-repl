@@ -3,6 +3,7 @@
 test('create a share', function () {
     $this->post('/share', [
         'code' => 'test-code',
+        'multisite' => false,
         'wordpress_version' => 'latest',
         'php_version' => '8.4',
     ])
@@ -10,6 +11,24 @@ test('create a share', function () {
 
     $this->assertDatabaseHas('shares', [
         'code' => 'test-code',
+        'multisite' => false,
+        'wordpress_version' => 'latest',
+        'php_version' => '8.4',
+    ]);
+});
+
+test('create a multisite share', function () {
+    $this->post('/share', [
+        'code' => 'test-code',
+        'multisite' => true,
+        'wordpress_version' => 'latest',
+        'php_version' => '8.4',
+    ])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('shares', [
+        'code' => 'test-code',
+        'multisite' => true,
         'wordpress_version' => 'latest',
         'php_version' => '8.4',
     ]);

@@ -19,8 +19,9 @@ class ShareController extends Controller
     {
         $validated = $request->validate([
             'code' => 'required|string',
-            'wordpress_version' => 'required|string|max:20',
+            'multisite' => 'required|boolean',
             'php_version' => 'required|numeric',
+            'wordpress_version' => 'required|string|max:20',
         ]);
 
         $share = new Share($validated);

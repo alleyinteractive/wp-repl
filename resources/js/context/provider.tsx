@@ -36,8 +36,22 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             ...defaultState,
             // Use the local storage settings if they exist.
             ...getLocalStorage(),
+            // Ensure that some properties are not inherited from local storage.
+            multisite: defaultState.multisite,
+            phpVersion: defaultState.phpVersion,
+            wordPressVersion: defaultState.wordPressVersion,
             // Override with the share settings if they exist.
-            ...(share ? { code: share.code, wordPressVersion: share.wordpress_version, phpVersion: share.php_version } : {}),
+            ...(share
+                ? {
+                      code: share.code,
+                      multisite: share.multisite,
+                      phpVersion: share.php_version,
+                      wordPressVersion: share.wordpress_version,
+                  }
+                : {}),
+            loading: true,
+            // Mark the state as ready to load the playground client.
+            ready: true,
         };
 
         dispatch(actionSetState(state));
@@ -51,9 +65,11 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
                 ...state,
                 // Avoid including specific properties but store other properties
                 // such as WordPress version, show/hide console, etc.
+                // Consider not restoring from local storage at all if this is a bad experience.
                 code: undefined,
                 output: undefined,
                 playgroundClient: undefined,
+                settingsOpen: undefined,
             }),
         );
     }, [state]);

@@ -1,45 +1,51 @@
-import { PlaygroundClient, SupportedPHPVersion } from '@wp-playground/client';
+import {
+    PlaygroundContextAction,
+    RESET,
+    SET_BROWSER_SHOWING,
+    SET_CODE,
+    SET_CONSOLE_SHOWING,
+    SET_ERROR,
+    SET_EXECUTION_TIME,
+    SET_LOADING,
+    SET_MULTISITE,
+    SET_OUTPUT,
+    SET_PHP_VERSION,
+    SET_PLAYGROUND_CLIENT,
+    SET_SETTINGS_OPEN,
+    SET_STATE,
+    SET_WORDPRESS_VERSION,
+} from './actions';
 import { defaultState, PlaygroundContextType } from './context';
-
-export type PlaygroundContextAction =
-    | { type: 'SET_BROWSER_SHOWING'; payload: boolean }
-    | { type: 'SET_CODE'; payload: string }
-    | { type: 'SET_CONSOLE_SHOWING'; payload: boolean }
-    | { type: 'SET_ERROR'; payload: string }
-    | { type: 'SET_EXECUTION_TIME'; payload: number }
-    | { type: 'SET_OUTPUT'; payload: string }
-    | { type: 'SET_PHP_VERSION'; payload: SupportedPHPVersion | 'latest' }
-    | { type: 'SET_PLAYGROUND_CLIENT'; payload: PlaygroundClient }
-    | { type: 'SET_SETTINGS_OPEN'; payload: boolean }
-    | { type: 'SET_WORDPRESS_VERSION'; payload: string }
-    | { type: 'SET_STATE'; payload: Omit<PlaygroundContextType, 'playgroundClient'> } // Allows partial updates to the state
-    | { type: 'RESET' };
 
 export const reducer: React.Reducer<PlaygroundContextType, PlaygroundContextAction> = (state, action) => {
     switch (action.type) {
-        case 'SET_BROWSER_SHOWING':
+        case SET_BROWSER_SHOWING:
             return { ...state, browserShowing: action.payload };
-        case 'SET_CODE':
+        case SET_CODE:
             return { ...state, code: action.payload };
-        case 'SET_CONSOLE_SHOWING':
+        case SET_CONSOLE_SHOWING:
             return { ...state, consoleShowing: action.payload };
-        case 'SET_ERROR':
+        case SET_ERROR:
             return { ...state, error: action.payload };
-        case 'SET_EXECUTION_TIME':
+        case SET_EXECUTION_TIME:
             return { ...state, executionTime: action.payload };
-        case 'SET_OUTPUT':
-            return { ...state, output: action.payload };
-        case 'SET_PHP_VERSION':
+        case SET_LOADING:
+            return { ...state, loading: action.payload };
+        case SET_MULTISITE:
+            return { ...state, multisite: action.payload };
+        case SET_OUTPUT:
+            return { ...state, loading: false, output: action.payload };
+        case SET_PHP_VERSION:
             return { ...state, phpVersion: action.payload };
-        case 'SET_PLAYGROUND_CLIENT':
+        case SET_PLAYGROUND_CLIENT:
             return { ...state, playgroundClient: action.payload };
-        case 'SET_SETTINGS_OPEN':
+        case SET_SETTINGS_OPEN:
             return { ...state, settingsOpen: action.payload };
-        case 'SET_WORDPRESS_VERSION':
+        case SET_WORDPRESS_VERSION:
             return { ...state, wordPressVersion: action.payload };
-        case 'SET_STATE':
-            return { ...state, ...action.payload }; // Merge the existing state with the new partial state,
-        case 'RESET':
+        case SET_STATE:
+            return { ...state, ...action.payload };
+        case RESET:
             return defaultState;
         default:
             return state;

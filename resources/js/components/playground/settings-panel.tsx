@@ -6,20 +6,21 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { actionSetPhpVersion, actionSetSettingsOpen, actionSetWordPressVersion } from '@/context';
+import { actionSetSettingsOpen, actionSetState, PlaygroundContextType } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { DEFAULT_PHP_VERSION } from '@/lib/constants';
 
 export function SettingsPanel() {
     const [localPhpVersion, setLocalPhpVersion] = useState<SupportedPHPVersion | 'latest'>('latest');
-    const [localWordPressVersion, setLocalWordPressVersion] = useState<string | 'latest'>('latest');
+    const [localWordPressVersion, setLocalWordPressVersion] = useState<PlaygroundContextType['wordPressVersion']>('latest');
+    const [localMultisite, setLocalMultisite] = useState<boolean>(false);
 
     const [supportedWPVersions, setSupportedWPVersions] = useState<Record<string, string>>({});
     const [latestWPVersion, setLatestWPVersion] = useState<string | null>(null);
 
     const {
         dispatch,
-        state: { phpVersion, playgroundClient, wordPressVersion, settingsOpen: open },
+        state: { phpVersion, playgroundClient, wordPressVersion, multisite, settingsOpen: open },
     } = usePlaygroundState();
 
     useEffect(() => {
@@ -44,15 +45,22 @@ export function SettingsPanel() {
     // Set the local state for PHP and WordPress versions when the component
     // mounts or when the global state changes.
     useEffect(() => {
+        setLocalMultisite(multisite);
         setLocalPhpVersion(phpVersion);
         setLocalWordPressVersion(wordPressVersion);
-    }, [phpVersion, wordPressVersion]);
+    }, [multisite, phpVersion, wordPressVersion]);
 
     const onClose = () => dispatch(actionSetSettingsOpen(false));
     const applySettings = () => {
-        dispatch(actionSetPhpVersion(localPhpVersion as SupportedPHPVersion));
-        dispatch(actionSetWordPressVersion(localWordPressVersion));
-        dispatch(actionSetSettingsOpen(false));
+        dispatch(
+            actionSetState({
+                loading: true,
+                multisite: localMultisite,
+                phpVersion: localPhpVersion as SupportedPHPVersion,
+                settingsOpen: false,
+                wordPressVersion: localWordPressVersion,
+            }),
+        );
     };
 
     return (
@@ -113,7 +121,7 @@ export function SettingsPanel() {
                                         name="wordPressVersion"
                                         className="w-full rounded-sm border border-gray-300 p-2 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
                                         defaultValue={localWordPressVersion}
-                                        onChange={(e) => setLocalWordPressVersion(e.target.value)}
+                                        onChange={(e) => setLocalWordPressVersion(e.target.value as PlaygroundContextType['wordPressVersion'])}
                                     >
                                         <option value="latest">Latest</option>
                                         {Object.entries(supportedWPVersions).map(([version, label]) => (
@@ -123,6 +131,19 @@ export function SettingsPanel() {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="space-y-3 px-4 pt-3 sm:px-6">
+                                    <input
+                                        id="multisite"
+                                        name="multisite"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                        checked={localMultisite}
+                                        onChange={(e) => setLocalMultisite(e.target.checked)}
+                                    />
+                                    <Label htmlFor="multisite" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Enable a Multisite Network
+                                    </Label>
                                 </div>
                                 <div className="mt-5 space-y-5 border-t px-4 pt-5">
                                     <p className="text-sm text-gray-500 dark:text-gray-400">

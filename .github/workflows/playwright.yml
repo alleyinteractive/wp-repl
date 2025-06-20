@@ -1,0 +1,55 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+jobs:
+  playwright:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+
+    - name: Install Dependencies
+      run: |
+        composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        cp .env.example .env
+        php artisan key:generate
+        npm install
+
+    - name: Install dependencies and build
+      run: npm ci && npm run build
+
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium --with-deps
+
+    - name: Start server and run tests
+      run: |
+        php artisan serve &
+
+        for i in {1..15}; do
+          if [[ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000)" == "200" ]]; then
+            echo "Server is up with 200 response!"
+            break
+          fi
+          echo "Waiting for server to start..."
+          sleep 2
+        done
+
+        npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

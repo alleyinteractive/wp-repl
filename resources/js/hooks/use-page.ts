@@ -1,10 +1,11 @@
 import { usePage as usePageHook } from '@inertiajs/react';
 
 export type ShareType = {
-    hash: string;
     code: string;
-    wordpress_version: string;
+    hash: string;
+    multisite: boolean;
     php_version: string;
+    wordpress_version: string;
 };
 
 export type PageProps = {

@@ -1,4 +1,4 @@
-import { actionSetError, actionSetExecutionTime, actionSetOutput } from '@/context';
+import { actionSetError, actionSetExecutionTime, actionSetLoading, actionSetOutput } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 
 export function useRunCode() {
@@ -21,19 +21,34 @@ export function useRunCode() {
             return;
         }
 
+        dispatch(actionSetLoading(true));
+
         // Inject the WordPress loader into the code.
         code = code.replace(/<\?php/, "<?php require_once '/wordpress/wp-load.php';");
 
         try {
             const startTime = performance.now();
-            const response = await playgroundClient.run({ code });
+            const response = await playgroundClient.run({
+                code,
+                headers: {
+                    // Set the host header to the playground to ensure that
+                    // get_site_by_path() inside of WordPress is able to find
+                    // the site properly.
+                    host: 'playground.wordpress.net:443',
+                },
+            });
             const endTime = performance.now();
+
+            if (response.httpStatusCode !== 200) {
+                console.log('Potential error in response', response);
+            }
 
             dispatch(actionSetOutput(response.text));
             dispatch(actionSetExecutionTime(endTime - startTime));
         } catch (error: unknown) {
+            console.error('error running code', error);
+
             if (error instanceof Error) {
-                console.error('error running code', error);
                 dispatch(actionSetOutput(error.message));
                 dispatch(actionSetExecutionTime(0));
             }

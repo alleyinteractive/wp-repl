@@ -1,7 +1,7 @@
 import { DEFAULT_PHP_VERSION } from '@/lib/constants';
 import { PlaygroundClient, SupportedPHPVersion } from '@wp-playground/client';
 import { createContext } from 'react';
-import { PlaygroundContextAction } from './reducer';
+import { PlaygroundContextAction } from './actions';
 
 export const DEFAULT_CODE = `<?php
 /*
@@ -35,24 +35,30 @@ export type PlaygroundContextType = {
     browserShowing?: boolean;
     code: string;
     consoleShowing?: boolean;
-    executionTime?: number;
     error?: string;
+    executionTime?: number;
+    loading: boolean;
+    multisite: boolean;
     output?: string;
     phpVersion: SupportedPHPVersion | 'latest';
     playgroundClient?: PlaygroundClient;
+    ready: boolean;
     settingsOpen?: boolean;
-    wordPressVersion: string;
+    wordPressVersion: 'latest' | 'nightly' | `${number}.${number}`;
 };
 
 export const defaultState: PlaygroundContextType = {
+    browserShowing: false,
     code: DEFAULT_CODE,
     consoleShowing: false,
-    browserShowing: false,
     error: undefined,
     executionTime: undefined,
+    loading: true,
+    multisite: false,
     output: undefined,
     phpVersion: DEFAULT_PHP_VERSION,
     playgroundClient: undefined,
+    ready: false,
     settingsOpen: false,
     wordPressVersion: 'latest',
 };

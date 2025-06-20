@@ -38,8 +38,8 @@ jobs:
         php artisan serve &
 
         for i in {1..15}; do
-          if curl -s http://localhost:8000 > /dev/null; then
-            echo "Server is up!"
+          if [[ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000)" == "200" ]]; then
+            echo "Server is up with 200 response!"
             break
           fi
           echo "Waiting for server to start..."

@@ -90,6 +90,7 @@ export default function Playground() {
                 {
                     code,
                     php_version: phpVersion,
+                    multisite,
                     wordpress_version: wordPressVersion,
                     [`${nameFieldName}`]: enabled ? '' : undefined,
                     [`${validFromFieldName}`]: enabled ? encryptedValidFrom : undefined,

@@ -45,6 +45,7 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
                       wordPressVersion: share.wordpress_version,
                   }
                 : {}),
+            loading: true,
             // Mark the state as ready to load the playground client.
             ready: true,
         };

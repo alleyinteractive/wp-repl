@@ -37,6 +37,7 @@ export type PlaygroundContextType = {
     consoleShowing?: boolean;
     error?: string;
     executionTime?: number;
+    loading: boolean;
     multisite: boolean;
     output?: string;
     phpVersion: SupportedPHPVersion | 'latest';
@@ -52,6 +53,7 @@ export const defaultState: PlaygroundContextType = {
     consoleShowing: false,
     error: undefined,
     executionTime: undefined,
+    loading: true,
     multisite: false,
     output: undefined,
     phpVersion: DEFAULT_PHP_VERSION,

@@ -6,6 +6,7 @@ import {
     SET_CONSOLE_SHOWING,
     SET_ERROR,
     SET_EXECUTION_TIME,
+    SET_LOADING,
     SET_MULTISITE,
     SET_OUTPUT,
     SET_PHP_VERSION,
@@ -28,10 +29,12 @@ export const reducer: React.Reducer<PlaygroundContextType, PlaygroundContextActi
             return { ...state, error: action.payload };
         case SET_EXECUTION_TIME:
             return { ...state, executionTime: action.payload };
+        case SET_LOADING:
+            return { ...state, loading: action.payload };
         case SET_MULTISITE:
             return { ...state, multisite: action.payload };
         case SET_OUTPUT:
-            return { ...state, output: action.payload };
+            return { ...state, loading: false, output: action.payload };
         case SET_PHP_VERSION:
             return { ...state, phpVersion: action.payload };
         case SET_PLAYGROUND_CLIENT:

@@ -6,6 +6,7 @@ export const SET_CODE = 'SET_CODE' as const;
 export const SET_CONSOLE_SHOWING = 'SET_CONSOLE_SHOWING' as const;
 export const SET_ERROR = 'SET_ERROR' as const;
 export const SET_EXECUTION_TIME = 'SET_EXECUTION_TIME' as const;
+export const SET_LOADING = 'SET_LOADING' as const;
 export const SET_MULTISITE = 'SET_MULTISITE' as const;
 export const SET_OUTPUT = 'SET_OUTPUT' as const;
 export const SET_PHP_VERSION = 'SET_PHP_VERSION' as const;
@@ -38,6 +39,11 @@ export const actionSetError = (error: PlaygroundContextType['error']) => ({
 export const actionSetExecutionTime = (executionTime: PlaygroundContextType['executionTime']) => ({
     type: SET_EXECUTION_TIME,
     payload: executionTime,
+});
+
+export const actionSetLoading = (loading: PlaygroundContextType['loading'] = true) => ({
+    type: SET_LOADING,
+    payload: loading,
 });
 
 export const actionSetMultisite = (multisite: PlaygroundContextType['multisite'] = false) => ({
@@ -85,6 +91,7 @@ export type PlaygroundContextAction =
     | ReturnType<typeof actionSetConsoleShowing>
     | ReturnType<typeof actionSetError>
     | ReturnType<typeof actionSetExecutionTime>
+    | ReturnType<typeof actionSetLoading>
     | ReturnType<typeof actionSetMultisite>
     | ReturnType<typeof actionSetOutput>
     | ReturnType<typeof actionSetPhpVersion>

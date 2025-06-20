@@ -1,4 +1,4 @@
-import { actionSetError, actionSetExecutionTime, actionSetOutput } from '@/context';
+import { actionSetError, actionSetExecutionTime, actionSetLoading, actionSetOutput } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 
 export function useRunCode() {
@@ -21,6 +21,8 @@ export function useRunCode() {
             return;
         }
 
+        dispatch(actionSetLoading(true));
+
         // Inject the WordPress loader into the code.
         code = code.replace(/<\?php/, "<?php require_once '/wordpress/wp-load.php';");
 
@@ -32,8 +34,9 @@ export function useRunCode() {
             dispatch(actionSetOutput(response.text));
             dispatch(actionSetExecutionTime(endTime - startTime));
         } catch (error: unknown) {
+            console.error('error running code', error);
+
             if (error instanceof Error) {
-                console.error('error running code', error);
                 dispatch(actionSetOutput(error.message));
                 dispatch(actionSetExecutionTime(0));
             }

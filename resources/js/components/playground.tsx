@@ -31,14 +31,19 @@ export default function Playground() {
 
         const setupPlayground = async () => {
             const steps: StepDefinition[] = [];
+            steps.push({
+                step: 'setSiteOptions',
+                options: {
+                    siteTitle: 'WordPress Playground',
+                    siteDescription: 'A WordPress Playground instance for testing and development.',
+                },
+            });
 
             if (multisite) {
                 steps.push({
                     step: 'enableMultisite',
                 });
             }
-
-            console.log('steps', steps);
 
             const client = await startPlaygroundWeb({
                 iframe: iframe.current!,
@@ -57,7 +62,6 @@ export default function Playground() {
                         password: 'password',
                     },
                     steps,
-                    // steps: [{ step: 'login', username: 'admin', password: 'password' }],
                 },
                 sapiName: 'cli',
             });

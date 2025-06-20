@@ -26,6 +26,10 @@ export function useRunCode() {
         // Inject the WordPress loader into the code.
         code = code.replace(/<\?php/, "<?php require_once '/wordpress/wp-load.php';");
 
+        // Replace the legacy way to include the WordPress loader that was moved
+        // in Playground.
+        code = code.replace(/'wordpress\/wp-load.php'/, "'/wordpress/wp-load.php'");
+
         try {
             const startTime = performance.now();
             const response = await playgroundClient.run({

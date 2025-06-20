@@ -58,13 +58,6 @@ export default function Playground() {
                 sapiName: 'cli',
             });
 
-            const errorLogPath = '/wordpress/wp-content/debug.log';
-
-            client.addEventListener('request.end', async () => {
-                const logs = await client.readFileAsText(errorLogPath);
-                console.log('logs', logs);
-            });
-
             await client.isReady();
 
             dispatch(actionSetPlaygroundClient(client));

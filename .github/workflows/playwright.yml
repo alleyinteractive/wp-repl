@@ -28,7 +28,10 @@ jobs:
     - name: Install dependencies and build
       run: npm ci && npm run build
 
-    - name: Start server
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium --with-deps
+
+    - name: Start server and run tests
       run: |
         php artisan serve &
 
@@ -41,12 +44,7 @@ jobs:
           sleep 2
         done
 
-    - name: Install Playwright Browsers
-      run: npx playwright install chromium --with-deps
-
-    - name: Run Playwright tests
-      run: npx playwright test
-
+        npx playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

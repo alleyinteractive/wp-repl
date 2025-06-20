@@ -52,6 +52,7 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             loading: true,
             // Mark the state as ready to load the playground client.
             ready: true,
+            settingsOpen: false,
         };
 
         dispatch(actionSetState(state));

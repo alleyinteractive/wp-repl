@@ -39,6 +39,10 @@ export function useRunCode() {
             });
             const endTime = performance.now();
 
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Response from playground:', response);
+            }
+
             if (response.httpStatusCode !== 200) {
                 console.log('Potential error in response', response);
             }

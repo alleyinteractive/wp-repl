@@ -58,6 +58,13 @@ export default function Playground() {
                 sapiName: 'cli',
             });
 
+            const errorLogPath = '/wordpress/wp-content/debug.log';
+
+            client.addEventListener('request.end', async () => {
+                const logs = await client.readFileAsText(errorLogPath);
+                console.log('logs', logs);
+            });
+
             await client.isReady();
 
             dispatch(actionSetPlaygroundClient(client));
@@ -182,7 +189,7 @@ export default function Playground() {
                 </div>
 
                 {/* Lower container for the iframe that will allow for a user to resize it to be taller */}
-                <div className={cn('flex flex-1', { hidden: !browserShowing && !consoleShowing })}>
+                <div className={cn('flex flex-1 overflow-hidden', { hidden: !browserShowing && !consoleShowing })}>
                     <div className="flex h-full w-full flex-row">
                         <iframe
                             ref={iframe}
@@ -194,15 +201,14 @@ export default function Playground() {
                             id="wp"
                             title="WordPress Playground"
                         />
-                        {consoleShowing ? (
-                            <ConsolePanel
-                                className={cn('hidden h-full lg:block', {
-                                    'lg:hidden': !console,
-                                    'lg:w-1/2': browserShowing && consoleShowing,
-                                    'lg:w-full': browserShowing && !consoleShowing,
-                                })}
-                            />
-                        ) : null}
+                        <ConsolePanel
+                            className={cn('hidden', {
+                                'h-full lg:block': consoleShowing,
+                                'lg:hidden': !console,
+                                'lg:w-1/2': browserShowing && consoleShowing,
+                                'lg:w-full': browserShowing && !consoleShowing,
+                            })}
+                        />
                     </div>
                 </div>
             </div>

@@ -1,13 +1,19 @@
 import { Tab, Tabs } from '@/components/tabs';
 import { usePlaygroundState } from '@/context/hook';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function OutputPanel() {
     const {
         state: { output, loading },
     } = usePlaygroundState();
     const [tab, setTab] = useState<'pre' | 'html'>('pre');
+
+    useEffect(() => {
+        if (output?.includes('<!DOCTYPE html>')) {
+            setTab('html');
+        }
+    }, [output]);
 
     return (
         <div

@@ -199,7 +199,7 @@ export default function Playground() {
                                 'h-full lg:block': consoleShowing,
                                 'lg:hidden': !console,
                                 'lg:w-1/2': browserShowing && consoleShowing,
-                                'lg:w-full': browserShowing && !consoleShowing,
+                                'lg:w-full': !browserShowing && consoleShowing,
                             })}
                         />
                     </div>

@@ -2,7 +2,9 @@
 
 An online REPL for WordPress that allows you to test and run PHP code snippets in a WordPress environment.
 
-[repl.alley.dev](https://repl.alley.dev)
+[![Screenshot of the REPL](./screenshots/screenshot.png)](https://repl.alley.dev)
+
+> [repl.alley.dev](https://repl.alley.dev)
 
 ## Credits
 

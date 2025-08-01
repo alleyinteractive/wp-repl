@@ -37,10 +37,10 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             // Use the local storage settings if they exist.
             ...getLocalStorage(),
             // Ensure that some properties are not inherited from local storage.
+            executionTime: defaultState.executionTime,
             multisite: defaultState.multisite,
             phpVersion: defaultState.phpVersion,
             wordPressVersion: defaultState.wordPressVersion,
-            executionTime: defaultState.executionTime,
             // Override with the share settings if they exist.
             ...(share
                 ? {
@@ -69,6 +69,8 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
                 // such as WordPress version, show/hide console, etc.
                 // Consider not restoring from local storage at all if this is a bad experience.
                 code: undefined,
+                executionTime: undefined,
+                loading: undefined,
                 output: undefined,
                 playgroundClient: undefined,
                 settingsOpen: undefined,

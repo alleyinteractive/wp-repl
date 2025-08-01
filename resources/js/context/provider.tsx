@@ -40,6 +40,7 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             multisite: defaultState.multisite,
             phpVersion: defaultState.phpVersion,
             wordPressVersion: defaultState.wordPressVersion,
+            executionTime: defaultState.executionTime,
             // Override with the share settings if they exist.
             ...(share
                 ? {

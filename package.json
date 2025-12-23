@@ -9,6 +9,7 @@
     "format": "eslint --fix . && prettier --write resources/",
     "lint": "npm run types && eslint .",
     "playwright": "playwright test",
+    "playwright:prod": "BASE_URL=https://repl.alley.dev playwright test",
     "types": "tsc --noEmit"
   },
   "devDependencies": {

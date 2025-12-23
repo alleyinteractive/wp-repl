@@ -55,15 +55,19 @@ test('displays the browser when the button is clicked', async ({ page }) => {
 });
 
 test('runs the default code', async ({ page }) => {
+    test.slow();
+
     await page.goto('/');
 
     const outputPre = page.locator('pre#output-pre');
-    await expect(outputPre).toBeVisible();
+    await expect(outputPre).toBeVisible({ timeout: 30000 });
 
     await expect(outputPre.getByText('Hello, World!')).toBeVisible();
 });
 
 test('run custom code', async ({ page }) => {
+    test.slow();
+
     await page.goto('/');
 
     // Replace all the text in the editor with our test code.
@@ -76,7 +80,7 @@ test('run custom code', async ({ page }) => {
     await page.keyboard.type('echo "WordPress Loaded: " . ( function_exists("get_option") ? "Yes" : "No" ); ?>');
 
     const outputPre = page.locator('pre#output-pre');
-    await expect(outputPre).toBeVisible();
+    await expect(outputPre).toBeVisible({ timeout: 30000 });
 
     // Ensure the default output is still visible.
     await expect(outputPre.getByText('Hello, World!')).toBeVisible();

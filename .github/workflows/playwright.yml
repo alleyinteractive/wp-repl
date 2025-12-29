@@ -63,6 +63,7 @@ jobs:
     - name: Run tests (production)
       if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: npm run playwright:prod
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

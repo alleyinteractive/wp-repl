@@ -1,5 +1,5 @@
-import type * as Monaco from 'monaco-editor';
 import wordpressFunctions from '@/data/wordpress-functions.json';
+import type * as Monaco from 'monaco-editor';
 
 interface WordPressFunction {
     name: string;

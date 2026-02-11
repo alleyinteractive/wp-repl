@@ -1,4 +1,5 @@
 import { useIsDark } from '@/hooks/use-appearance';
+import { registerWordPressAutocomplete } from '@/lib/wordpress-autocomplete';
 import { default as Monaco } from '@monaco-editor/react';
 
 /**
@@ -16,6 +17,9 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
             language="php"
             height="100%"
             beforeMount={(monaco) => {
+                // Register WordPress autocomplete
+                registerWordPressAutocomplete(monaco);
+
                 monaco.editor.defineTheme('custom-dark', {
                     base: 'vs-dark',
                     inherit: true,
@@ -63,6 +67,8 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
                     enabled: false,
                 },
                 quickSuggestions: {
+                    other: true,
+                    comments: false,
                     strings: false,
                 },
                 wordWrap: 'on',

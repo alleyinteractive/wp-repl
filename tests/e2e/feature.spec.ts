@@ -96,7 +96,8 @@ test('displays the welcome panel with examples', async ({ page }) => {
     await page.goto('/');
 
     // The welcome panel should be visible with the heading
-    await expect(page.getByRole('heading', { name: 'Welcome to REPL for WordPress!' })).toBeVisible();
+    const welcomeHeading = page.getByRole('heading', { name: 'Welcome to REPL for WordPress!' });
+    await expect(welcomeHeading).toBeVisible();
 
     // Check that example buttons are visible
     await expect(page.getByRole('button', { name: /Query Posts/i })).toBeVisible();
@@ -106,8 +107,11 @@ test('displays the welcome panel with examples', async ({ page }) => {
     // Click on an example and verify it loads
     await page.getByRole('button', { name: /Query Posts/i }).click();
 
-    // The welcome panel should disappear after clicking an example
-    await expect(page.getByRole('heading', { name: 'Welcome to REPL for WordPress!' })).toBeHidden();
+    // The welcome panel (both heading and the entire overlay) should disappear after clicking an example
+    await expect(welcomeHeading).toBeHidden();
+    
+    // Verify that the welcome message text is also gone
+    await expect(page.getByText('Get started with one of these examples')).toBeHidden();
 
     // The editor should now contain the example code
     const editor = page.getByRole("code").nth(0);

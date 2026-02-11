@@ -169,6 +169,8 @@ echo '<pre>' . print_r(array_filter($registered_blocks, function($block) {
 
 export function WelcomePanel() {
     const { dispatch } = usePlaygroundState();
+    const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const modifierKey = isMac ? 'Cmd' : 'Ctrl';
 
     const loadExample = (code: string) => {
         dispatch(actionSetCode(code));
@@ -204,7 +206,8 @@ export function WelcomePanel() {
 
                 <div className="mt-6 text-center">
                     <p className="text-muted-foreground text-xs">
-                        Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">Ctrl + Enter</kbd> to run the default code
+                        Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the
+                        default code
                     </p>
                 </div>
             </div>

@@ -123,9 +123,10 @@ for (let i = 0; i < lines.length; i++) {
             .filter(Boolean);
 
         // Build signature for snippet
+        // Note: We don't include $ in the placeholder text to avoid Monaco treating it as a variable
         const signature = paramList
             .map((p, idx) => {
-                return `\${${idx + 1}:$${p.name}}`;
+                return `\${${idx + 1}:${p.name}}`;
             })
             .join(', ');
 

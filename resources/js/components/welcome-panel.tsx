@@ -1,7 +1,7 @@
-import { Code, Filter, FileText, Blocks, Search, Database } from 'lucide-react';
 import { actionSetCode } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { cn } from '@/lib/utils';
+import { Blocks, Code, Database, FileText, Filter, Search } from 'lucide-react';
 
 interface Example {
     icon: React.ComponentType<{ className?: string }>;
@@ -175,13 +175,11 @@ export function WelcomePanel() {
     };
 
     return (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/95 p-4 backdrop-blur-sm">
+        <div className="bg-background/95 absolute inset-0 z-10 flex items-center justify-center p-4 backdrop-blur-sm">
             <div className="w-full max-w-4xl">
                 <div className="mb-6 text-center">
-                    <h2 className="text-2xl font-semibold text-foreground">Welcome to REPL for WordPress!</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Get started with one of these examples, or start coding your own
-                    </p>
+                    <h2 className="text-foreground text-2xl font-semibold">Welcome to REPL for WordPress!</h2>
+                    <p className="text-muted-foreground mt-2 text-sm">Get started with one of these examples, or start coding your own</p>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -192,22 +190,21 @@ export function WelcomePanel() {
                             className={cn(
                                 'group flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-all',
                                 'hover:border-primary hover:bg-accent hover:shadow-md',
-                                'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                                'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none',
                             )}
                         >
                             <div className="flex items-center gap-2">
-                                <example.icon className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
-                                <h3 className="font-medium text-foreground">{example.title}</h3>
+                                <example.icon className="text-muted-foreground group-hover:text-primary h-5 w-5" />
+                                <h3 className="text-foreground font-medium">{example.title}</h3>
                             </div>
-                            <p className="text-xs text-muted-foreground">{example.description}</p>
+                            <p className="text-muted-foreground text-xs">{example.description}</p>
                         </button>
                     ))}
                 </div>
 
                 <div className="mt-6 text-center">
-                    <p className="text-xs text-muted-foreground">
-                        Or press <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">Ctrl + Enter</kbd> to run the
-                        default code
+                    <p className="text-muted-foreground text-xs">
+                        Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">Ctrl + Enter</kbd> to run the default code
                     </p>
                 </div>
             </div>

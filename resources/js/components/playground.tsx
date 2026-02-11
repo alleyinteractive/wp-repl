@@ -173,15 +173,48 @@ export default function Playground() {
                 </div>
             </header>
             <div className="flex h-full w-full flex-1 flex-col overflow-auto">
-                {/* Upper container for the textarea and output */}
-                <div
-                    className={cn('flex h-full overflow-hidden', {
-                        'lg:h-2/3 lg:border-b': browserShowing || consoleShowing,
-                        'lg:h-full': !browserShowing && !consoleShowing,
-                    })}
-                >
-                    {isDesktop ? (
-                        // Desktop: resizable side-by-side panels
+                {isDesktop && (browserShowing || consoleShowing) ? (
+                    // Desktop with browser/console: vertical resizable layout
+                    <Group orientation="vertical" className="h-full w-full">
+                        <Panel defaultSize={67} minSize={30}>
+                            <div className="flex h-full overflow-hidden">
+                                <Group orientation="horizontal" className="h-full w-full">
+                                    <Panel defaultSize={50} minSize={20}>
+                                        <EditorPanel />
+                                    </Panel>
+                                    <Separator className="bg-border w-1 cursor-col-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
+                                    <Panel defaultSize={50} minSize={20}>
+                                        <OutputPanel />
+                                    </Panel>
+                                </Group>
+                            </div>
+                        </Panel>
+                        <Separator className="bg-border h-1 cursor-row-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
+                        <Panel defaultSize={33} minSize={20}>
+                            <div className="flex h-full w-full flex-row">
+                                <iframe
+                                    ref={iframe}
+                                    className={cn('h-full', {
+                                        hidden: !browserShowing,
+                                        'w-1/2': browserShowing && consoleShowing,
+                                        'w-full': browserShowing && !consoleShowing,
+                                    })}
+                                    id="wp"
+                                    title="WordPress Playground"
+                                />
+                                <ConsolePanel
+                                    className={cn('h-full', {
+                                        hidden: !consoleShowing,
+                                        'w-1/2': browserShowing && consoleShowing,
+                                        'w-full': !browserShowing && consoleShowing,
+                                    })}
+                                />
+                            </div>
+                        </Panel>
+                    </Group>
+                ) : isDesktop ? (
+                    // Desktop without browser/console: horizontal resizable layout only
+                    <div className="flex h-full overflow-hidden">
                         <Group orientation="horizontal" className="h-full w-full">
                             <Panel defaultSize={50} minSize={20}>
                                 <EditorPanel />
@@ -191,42 +224,18 @@ export default function Playground() {
                                 <OutputPanel />
                             </Panel>
                         </Group>
-                    ) : (
-                        // Mobile: stacked vertical layout
-                        <>
-                            <div className="flex h-1/2 w-full flex-col border-b">
-                                <EditorPanel />
-                            </div>
-                            <div className="flex h-1/2 w-full flex-col">
-                                <OutputPanel />
-                            </div>
-                        </>
-                    )}
-                </div>
-
-                {/* Lower container for the iframe that will allow for a user to resize it to be taller */}
-                <div className={cn('flex flex-1 overflow-hidden', { hidden: !browserShowing && !consoleShowing })}>
-                    <div className="flex h-full w-full flex-row">
-                        <iframe
-                            ref={iframe}
-                            className={cn('hidden h-full lg:block', {
-                                'lg:hidden': !browserShowing,
-                                'lg:w-1/2': browserShowing && consoleShowing,
-                                'lg:w-full': browserShowing && !consoleShowing,
-                            })}
-                            id="wp"
-                            title="WordPress Playground"
-                        />
-                        <ConsolePanel
-                            className={cn('hidden', {
-                                'h-full lg:block': consoleShowing,
-                                'lg:hidden': !console,
-                                'lg:w-1/2': browserShowing && consoleShowing,
-                                'lg:w-full': !browserShowing && consoleShowing,
-                            })}
-                        />
                     </div>
-                </div>
+                ) : (
+                    // Mobile: stacked vertical layout (no resizing)
+                    <>
+                        <div className="flex h-1/2 w-full flex-col border-b">
+                            <EditorPanel />
+                        </div>
+                        <div className="flex h-1/2 w-full flex-col">
+                            <OutputPanel />
+                        </div>
+                    </>
+                )}
             </div>
             <SettingsPanel />
             <SharePopover />

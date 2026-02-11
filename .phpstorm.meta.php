@@ -1237,6 +1237,7 @@ namespace PHPSTORM_META {
             'tinker.commands' => 'array',
             'tinker.alias' => 'array',
             'tinker.dont_alias' => 'array',
+            'tinker.trust_project' => 'string',
         ]));
     override(\Illuminate\Config\Repository::get(), map([
             'hashing.driver' => 'string',
@@ -1674,6 +1675,7 @@ namespace PHPSTORM_META {
             'tinker.commands' => 'array',
             'tinker.alias' => 'array',
             'tinker.dont_alias' => 'array',
+            'tinker.trust_project' => 'string',
         ]));
     override(\Illuminate\Support\Facades\Config::get(), map([
             'hashing.driver' => 'string',
@@ -2111,6 +2113,7 @@ namespace PHPSTORM_META {
             'tinker.commands' => 'array',
             'tinker.alias' => 'array',
             'tinker.dont_alias' => 'array',
+            'tinker.trust_project' => 'string',
         ]));
 
 
@@ -2237,7 +2240,8 @@ namespace PHPSTORM_META {
 'ide-helper.ignored_models','ide-helper.model_hooks','ide-helper.extra.Eloquent','ide-helper.extra.Session','ide-helper.magic',
 'ide-helper.interfaces','ide-helper.model_camel_case_properties','ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks',
 'ide-helper.force_fqn','ide-helper.use_generics_annotations','ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory','ide-helper.additional_relation_types','ide-helper.additional_relation_return_types',
-'ide-helper.enforce_nullable_relationships','ide-helper.post_migrate','tinker.commands','tinker.alias','tinker.dont_alias',);
+'ide-helper.enforce_nullable_relationships','ide-helper.post_migrate','tinker.commands','tinker.alias','tinker.dont_alias',
+'tinker.trust_project',);
         registerArgumentsSet('middleware', 
 'web','api',);
         registerArgumentsSet('routes', 'home','share.store','share.show','storage.local',);

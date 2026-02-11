@@ -23,6 +23,9 @@ yarn-error.log
 /.vscode
 /.zed
 
+# Temporary build files
+/.tmp
+
 # Playwright
 node_modules/
 /test-results/

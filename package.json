@@ -7,6 +7,7 @@
     "dev": "vite",
     "format:check": "prettier --check resources/",
     "format": "eslint --fix . && prettier --write resources/",
+    "generate:wordpress-functions": "node scripts/generate-wordpress-functions.cjs",
     "lint": "npm run types && eslint .",
     "playwright": "playwright test",
     "playwright:prod": "BASE_URL=https://repl.alley.dev playwright test",

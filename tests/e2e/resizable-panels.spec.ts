@@ -29,9 +29,9 @@ test.describe('Resizable Panels', () => {
         // Wait for the page to load
         await page.waitForLoadState('networkidle');
 
-        // The panel separator should not be visible on mobile
+        // The panel separator should not exist on mobile (not rendered, not just hidden)
         const panelSeparator = page.locator('[role="separator"]').first();
-        await expect(panelSeparator).toBeHidden();
+        await expect(panelSeparator).not.toBeAttached();
 
         // Both editor and output should still be accessible in stacked layout
         const editor = page.getByRole('code').first();

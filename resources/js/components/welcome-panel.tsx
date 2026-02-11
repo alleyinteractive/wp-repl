@@ -168,7 +168,7 @@ echo '<pre>' . print_r(array_filter($registered_blocks, function($block) {
 ];
 
 export function WelcomePanel() {
-    const { dispatch } = usePlaygroundState();
+    const { dispatch, state: { output, loading } } = usePlaygroundState();
     const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const modifierKey = isMac ? 'Cmd' : 'Ctrl';
 
@@ -177,38 +177,50 @@ export function WelcomePanel() {
     };
 
     return (
-        <div className="bg-background/95 absolute inset-0 z-10 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="w-full max-w-4xl">
-                <div className="mb-6 text-center">
-                    <h2 className="text-foreground text-2xl font-semibold">Welcome to REPL for WordPress!</h2>
-                    <p className="text-muted-foreground mt-2 text-sm">Get started with one of these examples, or start coding your own</p>
+        <div className="absolute inset-0 z-10 flex flex-col overflow-auto bg-background">
+            {/* Output section at the top */}
+            {output && (
+                <div className="border-b px-3 pt-2 pb-4">
+                    <pre className="text-sm">
+                        {output}
+                    </pre>
                 </div>
+            )}
+            
+            {/* Welcome content */}
+            <div className="flex flex-1 items-center justify-center p-4">
+                <div className="w-full max-w-4xl">
+                    <div className="mb-6 text-center">
+                        <h2 className="text-foreground text-2xl font-semibold">Welcome to REPL for WordPress!</h2>
+                        <p className="text-muted-foreground mt-2 text-sm">Get started with one of these examples, or start coding your own</p>
+                    </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {EXAMPLES.map((example) => (
-                        <button
-                            key={example.title}
-                            onClick={() => loadExample(example.code)}
-                            className={cn(
-                                'group flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-all',
-                                'hover:border-primary hover:bg-accent hover:shadow-md',
-                                'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none',
-                            )}
-                        >
-                            <div className="flex items-center gap-2">
-                                <example.icon className="text-muted-foreground group-hover:text-primary h-5 w-5" />
-                                <h3 className="text-foreground font-medium">{example.title}</h3>
-                            </div>
-                            <p className="text-muted-foreground text-xs">{example.description}</p>
-                        </button>
-                    ))}
-                </div>
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {EXAMPLES.map((example) => (
+                            <button
+                                key={example.title}
+                                onClick={() => loadExample(example.code)}
+                                className={cn(
+                                    'group flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-all',
+                                    'hover:border-primary hover:bg-accent hover:shadow-md',
+                                    'focus:ring-primary focus:ring-2 focus:ring-offset-2 focus:outline-none',
+                                )}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <example.icon className="text-muted-foreground group-hover:text-primary h-5 w-5" />
+                                    <h3 className="text-foreground font-medium">{example.title}</h3>
+                                </div>
+                                <p className="text-muted-foreground text-xs">{example.description}</p>
+                            </button>
+                        ))}
+                    </div>
 
-                <div className="mt-6 text-center">
-                    <p className="text-muted-foreground text-xs">
-                        Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the
-                        default code
-                    </p>
+                    <div className="mt-6 text-center">
+                        <p className="text-muted-foreground text-xs">
+                            Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the
+                            default code
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

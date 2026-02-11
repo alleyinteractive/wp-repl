@@ -75,7 +75,7 @@ export function OutputPanel() {
                         id="output-html"
                     />
                 ) : null}
-                {showWelcome && <WelcomePanel />}
+                {showWelcome && 'pre' === tab ? <WelcomePanel /> : null}
             </div>
         </div>
     );

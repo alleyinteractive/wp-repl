@@ -118,3 +118,30 @@ test('displays the welcome panel with examples', async ({ page }) => {
     await expect(editor).toContainText('WP_Query');
 });
 
+test('loads plugin from URL query parameter', async ({ page }) => {
+    test.slow();
+
+    // Navigate to the page with a plugin query parameter
+    await page.goto('/?plugin=hello-dolly');
+
+    // Wait for the playground to be ready - we can check for the output to appear
+    const outputPre = page.locator('pre#output-pre');
+    await expect(outputPre).toBeVisible({ timeout: 60000 });
+
+    // Run a simple code to test that WordPress is loaded
+    const editor = page.getByRole("code").nth(0);
+    await editor.click();
+    await page.keyboard.press('Control+KeyA');
+    await page.keyboard.type('<?php\n');
+    await page.keyboard.type('// Check if hello-dolly plugin is active\n');
+    await page.keyboard.type('$plugins = get_option("active_plugins");\n');
+    await page.keyboard.type('echo "Active plugins: " . implode(", ", $plugins);\n');
+    await page.keyboard.type('?>');
+
+    // Run the code
+    await page.getByTestId('run-code-button').click();
+
+    // Wait for the output and check if hello-dolly is mentioned
+    await expect(outputPre).toContainText('hello-dolly', { timeout: 30000 });
+});
+

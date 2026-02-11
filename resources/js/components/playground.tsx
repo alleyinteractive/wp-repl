@@ -31,9 +31,33 @@ export default function Playground() {
 
         const setupPlayground = async () => {
             const steps: StepDefinition[] = [];
+
+            // Add login step first to ensure user is authenticated before plugin/theme installation
+            steps.push({
+                step: 'login',
+                username: 'admin',
+                password: 'password',
+            } as StepDefinition);
+
             if (multisite) {
                 steps.push({
                     step: 'enableMultisite',
+                });
+            }
+
+            // Install plugins via steps if provided
+            if (plugins.length > 0) {
+                plugins.forEach((plugin) => {
+                    steps.push({
+                        step: 'installPlugin',
+                        pluginData: {
+                            resource: 'wordpress.org/plugins',
+                            slug: plugin,
+                        },
+                        options: {
+                            activate: true,
+                        },
+                    } as StepDefinition);
                 });
             }
 
@@ -62,11 +86,6 @@ export default function Playground() {
                         networking: true,
                     },
                     landingPage: '/',
-                    login: {
-                        username: 'admin',
-                        password: 'password',
-                    },
-                    plugins: plugins.length > 0 ? plugins : undefined,
                     steps,
                 },
                 sapiName: 'cli',

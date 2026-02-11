@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
-import { startPlaygroundWeb, StepDefinition } from '@wp-playground/client';
+import { StepDefinition } from '@wp-playground/blueprints';
+import { startPlaygroundWeb } from '@wp-playground/client';
 import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
 import { Group, Panel, Separator } from 'react-resizable-panels';

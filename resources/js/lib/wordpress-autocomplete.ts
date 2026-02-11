@@ -29,6 +29,7 @@ export function registerWordPressAutocomplete(monaco: typeof Monaco): void {
             // Create completion items from WordPress functions
             const suggestions: Monaco.languages.CompletionItem[] = (wordpressFunctions as WordPressFunction[]).map((func) => {
                 // Create snippet for function with parameters
+                // The signature is already in snippet format with placeholders (e.g., "${1:$option}, ${2:$default}")
                 const insertText = func.params.length > 0 ? `${func.name}(${func.signature})` : `${func.name}()`;
 
                 return {

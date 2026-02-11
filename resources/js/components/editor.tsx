@@ -68,7 +68,6 @@ export function Editor(props: React.ComponentProps<typeof Monaco>) {
                 },
                 quickSuggestions: {
                     other: true,
-                    comments: false,
                     strings: false,
                 },
                 wordWrap: 'on',

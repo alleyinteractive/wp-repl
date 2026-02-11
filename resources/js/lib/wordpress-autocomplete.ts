@@ -9,6 +9,14 @@ interface WordPressFunction {
         name: string;
         optional: boolean;
     }>;
+    since: string | null;
+}
+
+/**
+ * Generates a WordPress developer documentation URL for a function
+ */
+function getDocumentationUrl(functionName: string): string {
+    return `https://developer.wordpress.org/reference/functions/${functionName}/`;
 }
 
 /**
@@ -32,11 +40,20 @@ export function registerWordPressAutocomplete(monaco: typeof Monaco): void {
                 // The signature is already in snippet format with placeholders (e.g., "${1:$option}, ${2:$default}")
                 const insertText = func.params.length > 0 ? `${func.name}(${func.signature})` : `${func.name}()`;
 
+                // Build detailed description with version info and link to docs
+                const sinceInfo = func.since ? `\n\n**Since:** WordPress ${func.since}` : '';
+                const docUrl = getDocumentationUrl(func.name);
+                const documentation: Monaco.IMarkdownString = {
+                    value: `${func.description}${sinceInfo}\n\n[View Documentation →](${docUrl})`,
+                    isTrusted: true,
+                    supportThemeIcons: true,
+                };
+
                 return {
                     label: func.name,
                     kind: monaco.languages.CompletionItemKind.Function,
-                    detail: 'WordPress function',
-                    documentation: func.description,
+                    detail: func.since ? `WordPress function (since ${func.since})` : 'WordPress function',
+                    documentation: documentation,
                     insertText: insertText,
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     range: range,

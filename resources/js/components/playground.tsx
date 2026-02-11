@@ -211,21 +211,21 @@ export default function Playground() {
                 {isDesktop && (browserShowing || consoleShowing) ? (
                     // Desktop with browser/console: vertical resizable layout
                     <Group orientation="vertical" className="h-full w-full">
-                        <Panel defaultSize={67} minSize={30}>
+                        <Panel defaultSize="50%" minSize="20%">
                             <div className="flex h-full overflow-hidden">
                                 <Group orientation="horizontal" className="h-full w-full">
-                                    <Panel defaultSize={50} minSize={20}>
+                                    <Panel defaultSize="50%" minSize="20%">
                                         <EditorPanel />
                                     </Panel>
                                     <Separator className="bg-border w-1 cursor-col-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
-                                    <Panel defaultSize={50} minSize={20}>
+                                    <Panel defaultSize="50%" minSize="20%">
                                         <OutputPanel />
                                     </Panel>
                                 </Group>
                             </div>
                         </Panel>
                         <Separator className="bg-border h-1 cursor-row-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
-                        <Panel defaultSize={33} minSize={20}>
+                        <Panel defaultSize="50%" minSize="20%">
                             <div className="flex h-full w-full flex-row">
                                 <iframe
                                     ref={iframe}

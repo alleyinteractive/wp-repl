@@ -111,4 +111,3 @@ test('create a share with both plugins and themes', function () {
     expect($share->plugins)->toBe(['hello-dolly']);
     expect($share->themes)->toBe(['twentytwentyfour']);
 });
-

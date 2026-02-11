@@ -12,7 +12,7 @@ export function OutputPanel() {
     const [tab, setTab] = useState<'pre' | 'html'>('pre');
 
     useEffect(() => {
-        if (output?.includes('<!DOCTYPE html>')) {
+        if (output?.includes('<!DOCTYPE html>') || output?.includes('<p')) {
             setTab('html');
         }
     }, [output]);
@@ -67,7 +67,7 @@ export function OutputPanel() {
                 {'html' === tab ? (
                     // Render with an iframe
                     <iframe
-                        className="h-full overflow-auto bg-white px-3 pt-2"
+                        className="h-full w-full overflow-auto bg-white px-3 pt-2"
                         srcDoc={output}
                         title="Output"
                         sandbox="allow-same-origin allow-scripts"

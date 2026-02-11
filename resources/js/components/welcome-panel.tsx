@@ -168,7 +168,7 @@ echo '<pre>' . print_r(array_filter($registered_blocks, function($block) {
 ];
 
 export function WelcomePanel() {
-    const { dispatch, state: { output, loading } } = usePlaygroundState();
+    const { dispatch } = usePlaygroundState();
     const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     const modifierKey = isMac ? 'Cmd' : 'Ctrl';
 
@@ -177,19 +177,10 @@ export function WelcomePanel() {
     };
 
     return (
-        <div className="absolute inset-0 z-10 flex flex-col overflow-auto bg-background">
-            {/* Output section at the top */}
-            {output && (
-                <div className="border-b px-3 pt-2 pb-4">
-                    <pre className="text-sm">
-                        {output}
-                    </pre>
-                </div>
-            )}
-
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col overflow-auto">
             {/* Welcome content */}
             <div className="flex flex-1 items-center justify-center p-4">
-                <div className="w-full max-w-4xl">
+                <div className="pointer-events-auto w-full max-w-4xl">
                     <div className="mb-6 text-center">
                         <h2 className="text-foreground text-2xl font-semibold">Welcome to REPL for WordPress!</h2>
                         <p className="text-muted-foreground mt-2 text-sm">Get started with one of these examples, or start coding your own</p>
@@ -217,7 +208,8 @@ export function WelcomePanel() {
 
                     <div className="mt-6 text-center">
                         <p className="text-muted-foreground text-xs">
-                            Press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the code in the editor.
+                            Press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the code
+                            in the editor.
                         </p>
                     </div>
                 </div>

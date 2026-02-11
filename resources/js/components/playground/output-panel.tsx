@@ -1,11 +1,13 @@
 import { Tab, Tabs } from '@/components/tabs';
+import { WelcomePanel } from '@/components/welcome-panel';
+import { DEFAULT_CODE } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 
 import { useEffect, useState } from 'react';
 
 export function OutputPanel() {
     const {
-        state: { output, loading },
+        state: { output, loading, code },
     } = usePlaygroundState();
     const [tab, setTab] = useState<'pre' | 'html'>('pre');
 
@@ -14,6 +16,8 @@ export function OutputPanel() {
             setTab('html');
         }
     }, [output]);
+
+    const showWelcome = code === DEFAULT_CODE;
 
     return (
         <div
@@ -49,27 +53,30 @@ export function OutputPanel() {
                     </div>
                 ) : null}
             </Tabs>
-            {'pre' === tab ? (
-                <>
-                    <div className="dark:bg-background h-full overflow-auto px-3 pt-2">
-                        <pre id="output-pre">
-                            {output}
-                            {!loading && !output ? 'No output produced.' : null}
-                        </pre>
-                    </div>
-                </>
-            ) : null}
-            {'html' === tab ? (
-                // Render with an iframe
-                <iframe
-                    className="h-full overflow-auto bg-white px-3 pt-2"
-                    srcDoc={output}
-                    title="Output"
-                    sandbox="allow-same-origin allow-scripts"
-                    style={{ border: 'none' }}
-                    id="output-html"
-                />
-            ) : null}
+            <div className="relative flex-1 overflow-hidden">
+                {'pre' === tab ? (
+                    <>
+                        <div className="dark:bg-background h-full overflow-auto px-3 pt-2">
+                            <pre id="output-pre">
+                                {output}
+                                {!loading && !output ? 'No output produced.' : null}
+                            </pre>
+                        </div>
+                    </>
+                ) : null}
+                {'html' === tab ? (
+                    // Render with an iframe
+                    <iframe
+                        className="h-full overflow-auto bg-white px-3 pt-2"
+                        srcDoc={output}
+                        title="Output"
+                        sandbox="allow-same-origin allow-scripts"
+                        style={{ border: 'none' }}
+                        id="output-html"
+                    />
+                ) : null}
+                {showWelcome && <WelcomePanel />}
+            </div>
         </div>
     );
 }

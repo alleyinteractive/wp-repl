@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { useKey } from 'react-use';
 
 import { Editor } from '@/components/editor';
-import { WelcomePanel } from '@/components/welcome-panel';
-import { actionSetCode, actionSetSettingsOpen, DEFAULT_CODE } from '@/context';
+import { actionSetCode, actionSetSettingsOpen } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { useIsDark } from '@/hooks/use-appearance';
 import { useRunCode } from '@/hooks/use-run-code';
@@ -40,14 +39,9 @@ export function EditorPanel() {
     // Update local code when the global code changes.
     useEffect(() => setLocalCode(code), [code]);
 
-    const showWelcome = code === DEFAULT_CODE;
-
     return (
         <form onSubmit={onSubmit} className="mr-2 flex w-1/2 max-w-1/2 flex-col border-r">
-            <div className="relative flex-1">
-                <Editor onChange={(value) => setLocalCode(value || '')} value={localCode} />
-                {showWelcome && <WelcomePanel />}
-            </div>
+            <Editor onChange={(value) => setLocalCode(value || '')} value={localCode} />
             {/* Bottom bar */}
             <div className="flex w-full flex-row justify-between border-t text-gray-500">
                 {/* Border between children */}

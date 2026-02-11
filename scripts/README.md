@@ -26,7 +26,8 @@ You should regenerate the functions data when:
 
 The generated JSON file contains:
 - **name**: Function name (e.g., `get_option`)
-- **signature**: Parameter snippet with placeholders (e.g., `${1:$option}, ${2:$default_value}`)
+- **signature**: Parameter snippet with placeholders (e.g., `${1:option}, ${2:default_value}`)
+  - Note: Parameter names don't include `$` prefix in placeholders to ensure Monaco displays them correctly
 - **description**: Short description from PHPDoc
 - **params**: Array of parameter objects with `name` and `optional` fields
 - **since**: WordPress version when function was introduced (e.g., `2.1.0`)
@@ -36,7 +37,7 @@ The generated JSON file contains:
 ```json
 {
   "name": "get_option",
-  "signature": "${1:$option}, ${2:$default_value}",
+  "signature": "${1:option}, ${2:default_value}",
   "description": "Retrieves an option value based on an option name.",
   "params": [
     { "name": "option", "optional": false },
@@ -45,6 +46,19 @@ The generated JSON file contains:
   "since": "1.5.0"
 }
 ```
+
+## Snippet Format
+
+The signature uses Monaco editor snippet syntax:
+- `${1:option}` = Tab stop 1 with placeholder text "option"
+- `${2:default_value}` = Tab stop 2 with placeholder text "default_value"
+
+When the user selects the autocomplete, they see:
+```php
+get_option(option, default_value)
+```
+
+They can then tab through each parameter, and typing replaces the placeholder text.
 
 ## Maintenance
 

@@ -14,6 +14,8 @@ use Illuminate\Support\Str;
  * @property bool $multisite
  * @property string $wordpress_version
  * @property array|null $options
+ * @property array|null $plugins
+ * @property array|null $themes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -67,6 +69,8 @@ class Share extends Model
     {
         return [
             'options' => AsArrayObject::class,
+            'plugins' => 'array',
+            'themes' => 'array',
         ];
     }
 }

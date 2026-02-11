@@ -5,6 +5,8 @@ export type ShareType = {
     hash: string;
     multisite: boolean;
     php_version: string;
+    plugins?: string[];
+    themes?: string[];
     wordpress_version: string;
 };
 

@@ -21,7 +21,7 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, multisite, phpVersion, playgroundClient, ready, wordPressVersion } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, ready, themes, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
 
     useEffect(() => {
@@ -53,6 +53,7 @@ export default function Playground() {
                         username: 'admin',
                         password: 'password',
                     },
+                    plugins: plugins.length > 0 ? plugins : undefined,
                     steps,
                 },
                 sapiName: 'cli',
@@ -66,7 +67,7 @@ export default function Playground() {
         if (iframe.current) {
             setupPlayground();
         }
-    }, [dispatch, iframe, multisite, phpVersion, ready, wordPressVersion]);
+    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {
@@ -87,6 +88,8 @@ export default function Playground() {
                     code,
                     php_version: phpVersion,
                     multisite,
+                    plugins,
+                    themes,
                     wordpress_version: wordPressVersion,
                     [`${nameFieldName}`]: enabled ? '' : undefined,
                     [`${validFromFieldName}`]: enabled ? encryptedValidFrom : undefined,

@@ -32,6 +32,11 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             }
         }
 
+        // Parse query parameters for plugins and themes
+        const urlParams = new URLSearchParams(window.location.search);
+        const pluginsFromUrl = urlParams.getAll('plugin');
+        const themesFromUrl = urlParams.getAll('theme');
+
         const state = {
             ...defaultState,
             // Use the local storage settings if they exist.
@@ -40,6 +45,8 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
             executionTime: defaultState.executionTime,
             multisite: defaultState.multisite,
             phpVersion: defaultState.phpVersion,
+            plugins: defaultState.plugins,
+            themes: defaultState.themes,
             wordPressVersion: defaultState.wordPressVersion,
             // Override with the share settings if they exist.
             ...(share
@@ -47,9 +54,14 @@ export function PlaygroundProvider({ children }: React.PropsWithChildren) {
                       code: share.code,
                       multisite: share.multisite,
                       phpVersion: share.php_version,
+                      plugins: share.plugins || [],
+                      themes: share.themes || [],
                       wordPressVersion: share.wordpress_version,
                   }
                 : {}),
+            // Override with URL query parameters if they exist
+            ...(pluginsFromUrl.length > 0 ? { plugins: pluginsFromUrl } : {}),
+            ...(themesFromUrl.length > 0 ? { themes: themesFromUrl } : {}),
             loading: true,
             // Mark the state as ready to load the playground client.
             ready: true,

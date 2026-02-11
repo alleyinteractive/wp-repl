@@ -50,10 +50,14 @@ test('WordPress function autocomplete can be selected', async ({ page }) => {
     await page.keyboard.type('wp_enqueue_scr');
 
     // Wait for autocomplete to appear
-    await page.waitForSelector('.monaco-list-row', { timeout: 5000 });
+    const suggestion = page.locator('.monaco-list-row').filter({ hasText: 'wp_enqueue_script' });
+    await expect(suggestion).toBeVisible({ timeout: 5000 });
 
     // Press Enter to select the first suggestion
     await page.keyboard.press('Enter');
+
+    // Wait a moment for insertion
+    await page.waitForTimeout(500);
 
     // Verify the function was inserted (check for opening parenthesis)
     const editorContent = await editor.textContent();
@@ -78,13 +82,20 @@ test('WordPress function autocomplete shows parameter names', async ({ page }) =
     await page.keyboard.type('<?php ');
 
     // Start typing get_post_meta (has 3 parameters)
-    await page.keyboard.type('get_post_meta');
+    await page.keyboard.type('get_post_');
 
     // Wait for autocomplete to appear
     await page.waitForSelector('.monaco-list-row', { timeout: 5000 });
 
+    // Look for the specific suggestion
+    const suggestion = page.locator('.monaco-list-row').filter({ hasText: 'get_post_meta' });
+    await expect(suggestion).toBeVisible({ timeout: 5000 });
+
     // Press Enter to select the suggestion
     await page.keyboard.press('Enter');
+
+    // Wait a moment for the snippet to be inserted
+    await page.waitForTimeout(500);
 
     // Verify the function was inserted with parameter placeholders
     const editorContent = await editor.textContent();

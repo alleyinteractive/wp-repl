@@ -40,7 +40,7 @@ export function EditorPanel() {
     useEffect(() => setLocalCode(code), [code]);
 
     return (
-        <form onSubmit={onSubmit} className="mr-2 flex w-1/2 max-w-1/2 flex-col border-r">
+        <form onSubmit={onSubmit} className="flex h-full w-full flex-col border-r lg:border-r-0">
             <Editor onChange={(value) => setLocalCode(value || '')} value={localCode} />
             {/* Bottom bar */}
             <div className="flex w-full flex-row justify-between border-t text-gray-500">

@@ -145,3 +145,30 @@ test('loads plugin from URL query parameter', async ({ page }) => {
     await expect(outputPre).toContainText('hello-dolly', { timeout: 30000 });
 });
 
+test('loads theme from URL query parameter', async ({ page }) => {
+    test.slow();
+
+    // Navigate to the page with a theme query parameter
+    await page.goto('/?theme=twentytwentyfour');
+
+    // Wait for the playground to be ready
+    const outputPre = page.locator('pre#output-pre');
+    await expect(outputPre).toBeVisible({ timeout: 60000 });
+
+    // Run code to check if the theme is installed
+    const editor = page.getByRole("code").nth(0);
+    await editor.click();
+    await page.keyboard.press('Control+KeyA');
+    await page.keyboard.type('<?php\n');
+    await page.keyboard.type('// Check installed themes\n');
+    await page.keyboard.type('$themes = wp_get_themes();\n');
+    await page.keyboard.type('echo "Installed themes: " . implode(", ", array_keys($themes));\n');
+    await page.keyboard.type('?>');
+
+    // Run the code
+    await page.getByTestId('run-code-button').click();
+
+    // Wait for the output and check if twentytwentyfour is mentioned
+    await expect(outputPre).toContainText('twentytwentyfour', { timeout: 30000 });
+});
+

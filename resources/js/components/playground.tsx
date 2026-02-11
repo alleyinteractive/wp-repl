@@ -37,6 +37,19 @@ export default function Playground() {
                 });
             }
 
+            // Install themes via steps if provided
+            if (themes.length > 0) {
+                themes.forEach((theme) => {
+                    steps.push({
+                        step: 'installTheme',
+                        themeData: {
+                            resource: 'wordpress.org/themes',
+                            slug: theme,
+                        },
+                    } as StepDefinition);
+                });
+            }
+
             const client = await startPlaygroundWeb({
                 iframe: iframe.current!,
                 remoteUrl: 'https://playground.wordpress.net/remote.html',

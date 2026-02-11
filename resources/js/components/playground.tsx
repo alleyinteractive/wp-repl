@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { startPlaygroundWeb, StepDefinition } from '@wp-playground/client';
 import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 
 import { AlleyLogo } from '@/components/alley';
 import { ConsolePanel, EditorPanel, OutputPanel, SettingsPanel } from '@/components/playground/index';
@@ -172,13 +173,30 @@ export default function Playground() {
             <div className="flex h-full w-full flex-1 flex-col overflow-auto">
                 {/* Upper container for the textarea and output */}
                 <div
-                    className={cn('relative flex h-full flex-row overflow-hidden', {
+                    className={cn('flex h-full overflow-hidden', {
                         'lg:h-2/3 lg:border-b': browserShowing || consoleShowing,
                         'lg:h-full': !browserShowing && !consoleShowing,
                     })}
                 >
-                    <EditorPanel />
-                    <OutputPanel />
+                    {/* Mobile: stacked layout, Desktop: resizable side-by-side */}
+                    <Group orientation="horizontal" className="hidden lg:flex">
+                        <Panel defaultSize={50} minSize={20}>
+                            <EditorPanel />
+                        </Panel>
+                        <Separator className="w-1 bg-border hover:bg-blue-500 active:bg-blue-600" />
+                        <Panel defaultSize={50} minSize={20}>
+                            <OutputPanel />
+                        </Panel>
+                    </Group>
+                    {/* Mobile stacked layout */}
+                    <div className="flex h-full w-full flex-col lg:hidden">
+                        <div className="h-1/2 border-b">
+                            <EditorPanel />
+                        </div>
+                        <div className="h-1/2">
+                            <OutputPanel />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Lower container for the iframe that will allow for a user to resize it to be taller */}

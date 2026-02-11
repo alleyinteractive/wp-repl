@@ -91,3 +91,26 @@ test('run custom code', async ({ page }) => {
     await expect(outputPre.getByText('Example test here')).toBeVisible();
     await expect(outputPre.getByText('WordPress Loaded: Yes')).toBeVisible();
 });
+
+test('displays the welcome panel with examples', async ({ page }) => {
+    await page.goto('/');
+
+    // The welcome panel should be visible with the heading
+    await expect(page.getByRole('heading', { name: 'Welcome to REPL for WordPress!' })).toBeVisible();
+
+    // Check that example buttons are visible
+    await expect(page.getByRole('button', { name: /Query Posts/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Add Filter/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Create Shortcode/i })).toBeVisible();
+
+    // Click on an example and verify it loads
+    await page.getByRole('button', { name: /Query Posts/i }).click();
+
+    // The welcome panel should disappear after clicking an example
+    await expect(page.getByRole('heading', { name: 'Welcome to REPL for WordPress!' })).toBeHidden();
+
+    // The editor should now contain the example code
+    const editor = page.getByRole("code").nth(0);
+    await expect(editor).toContainText('WP_Query');
+});
+

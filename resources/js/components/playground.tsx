@@ -172,14 +172,14 @@ export default function Playground() {
             </header>
             <div className="flex h-full w-full flex-1 flex-col overflow-auto">
                 {/* Upper container for the textarea and output */}
+                {/* Desktop: resizable side-by-side panels */}
                 <div
-                    className={cn('flex h-full overflow-hidden', {
+                    className={cn('hidden h-full overflow-hidden lg:flex', {
                         'lg:h-2/3 lg:border-b': browserShowing || consoleShowing,
                         'lg:h-full': !browserShowing && !consoleShowing,
                     })}
                 >
-                    {/* Mobile: stacked layout, Desktop: resizable side-by-side */}
-                    <Group orientation="horizontal" className="hidden lg:flex">
+                    <Group orientation="horizontal" className="h-full w-full">
                         <Panel defaultSize={50} minSize={20}>
                             <EditorPanel />
                         </Panel>
@@ -188,14 +188,19 @@ export default function Playground() {
                             <OutputPanel />
                         </Panel>
                     </Group>
-                    {/* Mobile stacked layout */}
-                    <div className="flex h-full w-full flex-col lg:hidden">
-                        <div className="h-1/2 border-b">
-                            <EditorPanel />
-                        </div>
-                        <div className="h-1/2">
-                            <OutputPanel />
-                        </div>
+                </div>
+                {/* Mobile: stacked vertical layout */}
+                <div
+                    className={cn('flex h-full w-full flex-col lg:hidden', {
+                        'lg:h-2/3 lg:border-b': browserShowing || consoleShowing,
+                        'lg:h-full': !browserShowing && !consoleShowing,
+                    })}
+                >
+                    <div className="flex h-1/2 w-full flex-col border-b">
+                        <EditorPanel />
+                    </div>
+                    <div className="flex h-1/2 w-full flex-col">
+                        <OutputPanel />
                     </div>
                 </div>
 

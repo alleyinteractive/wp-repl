@@ -53,7 +53,7 @@ add_filter('the_content', function($content) {
     $message = '<div style="padding: 10px; background: #f0f0f0; border-left: 3px solid #0073aa;">';
     $message .= '<strong>Note:</strong> This content has been filtered!';
     $message .= '</div>';
-    
+
     return $message . $content;
 });
 
@@ -74,7 +74,7 @@ add_shortcode('hello', function($atts) {
     $atts = shortcode_atts([
         'name' => 'World',
     ], $atts);
-    
+
     return '<strong>Hello, ' . esc_html($atts['name']) . '!</strong>';
 });
 
@@ -97,11 +97,11 @@ global $wpdb;
 
 // Get the latest 5 posts directly from the database
 $posts = $wpdb->get_results("
-    SELECT ID, post_title, post_date 
-    FROM {$wpdb->posts} 
-    WHERE post_status = 'publish' 
+    SELECT ID, post_title, post_date
+    FROM {$wpdb->posts}
+    WHERE post_status = 'publish'
     AND post_type = 'post'
-    ORDER BY post_date DESC 
+    ORDER BY post_date DESC
     LIMIT 5
 ");
 
@@ -150,7 +150,7 @@ register_block_type('my-plugin/example-block', [
     'title' => 'Example Block',
     'category' => 'text',
     'render_callback' => function($attributes, $content) {
-        return '<div class="my-example-block">' . 
+        return '<div class="my-example-block">' .
                '<h3>Custom Block</h3>' .
                '<p>This is a custom Gutenberg block!</p>' .
                '</div>';
@@ -186,7 +186,7 @@ export function WelcomePanel() {
                     </pre>
                 </div>
             )}
-            
+
             {/* Welcome content */}
             <div className="flex flex-1 items-center justify-center p-4">
                 <div className="w-full max-w-4xl">
@@ -217,8 +217,7 @@ export function WelcomePanel() {
 
                     <div className="mt-6 text-center">
                         <p className="text-muted-foreground text-xs">
-                            Or press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the
-                            default code
+                            Press <kbd className="bg-muted rounded border px-1.5 py-0.5 font-mono text-xs">{modifierKey} + Enter</kbd> to run the code in the editor.
                         </p>
                     </div>
                 </div>

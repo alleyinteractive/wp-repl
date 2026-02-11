@@ -21,6 +21,10 @@ class ShareController extends Controller
             'code' => 'required|string',
             'multisite' => 'required|boolean',
             'php_version' => 'required|numeric',
+            'plugins' => 'nullable|array',
+            'plugins.*' => 'string',
+            'themes' => 'nullable|array',
+            'themes.*' => 'string',
             'wordpress_version' => 'required|string|max:20',
         ]);
 

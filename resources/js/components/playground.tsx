@@ -183,7 +183,7 @@ export default function Playground() {
                         <Panel defaultSize={50} minSize={20}>
                             <EditorPanel />
                         </Panel>
-                        <Separator className="bg-border w-1 hover:bg-blue-500 active:bg-blue-600" />
+                        <Separator className="bg-border w-1 cursor-col-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
                         <Panel defaultSize={50} minSize={20}>
                             <OutputPanel />
                         </Panel>

@@ -12,7 +12,12 @@ export function OutputPanel() {
     const [tab, setTab] = useState<'pre' | 'html'>('pre');
 
     useEffect(() => {
-        if (output?.includes('<!DOCTYPE html>') || output?.includes('<p')) {
+        // Check for HTML by looking for common tags, excluding <br> and <br/>
+        const hasHTML =
+            output &&
+            (/<!DOCTYPE html>/i.test(output) ||
+                /<(html|head|body|div|span|p|h[1-6]|ul|ol|li|table|form|input|button|a|img|section|article|nav|header|footer|main)\b/i.test(output));
+        if (hasHTML) {
             setTab('html');
         }
     }, [output]);

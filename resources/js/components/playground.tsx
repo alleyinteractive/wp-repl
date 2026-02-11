@@ -23,7 +23,7 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, multisite, phpVersion, playgroundClient, ready, wordPressVersion } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, ready, themes, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
     const isDesktop = useMedia('(min-width: 1024px)', true);
 
@@ -34,9 +34,46 @@ export default function Playground() {
 
         const setupPlayground = async () => {
             const steps: StepDefinition[] = [];
+
+            // Add login step first to ensure user is authenticated before plugin/theme installation
+            steps.push({
+                step: 'login',
+                username: 'admin',
+                password: 'password',
+            } as StepDefinition);
+
             if (multisite) {
                 steps.push({
                     step: 'enableMultisite',
+                });
+            }
+
+            // Install plugins via steps if provided
+            if (plugins.length > 0) {
+                plugins.forEach((plugin) => {
+                    steps.push({
+                        step: 'installPlugin',
+                        pluginData: {
+                            resource: 'wordpress.org/plugins',
+                            slug: plugin,
+                        },
+                        options: {
+                            activate: true,
+                        },
+                    } as StepDefinition);
+                });
+            }
+
+            // Install themes via steps if provided
+            if (themes.length > 0) {
+                themes.forEach((theme) => {
+                    steps.push({
+                        step: 'installTheme',
+                        themeData: {
+                            resource: 'wordpress.org/themes',
+                            slug: theme,
+                        },
+                    } as StepDefinition);
                 });
             }
 
@@ -52,10 +89,6 @@ export default function Playground() {
                         networking: true,
                     },
                     landingPage: '/',
-                    login: {
-                        username: 'admin',
-                        password: 'password',
-                    },
                     steps,
                 },
                 sapiName: 'cli',
@@ -69,7 +102,7 @@ export default function Playground() {
         if (iframe.current) {
             setupPlayground();
         }
-    }, [dispatch, iframe, multisite, phpVersion, ready, wordPressVersion]);
+    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {
@@ -90,6 +123,8 @@ export default function Playground() {
                     code,
                     php_version: phpVersion,
                     multisite,
+                    plugins,
+                    themes,
                     wordpress_version: wordPressVersion,
                     [`${nameFieldName}`]: enabled ? '' : undefined,
                     [`${validFromFieldName}`]: enabled ? encryptedValidFrom : undefined,

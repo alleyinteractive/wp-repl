@@ -11,8 +11,10 @@ import {
     SET_OUTPUT,
     SET_PHP_VERSION,
     SET_PLAYGROUND_CLIENT,
+    SET_PLUGINS,
     SET_SETTINGS_OPEN,
     SET_STATE,
+    SET_THEMES,
     SET_WORDPRESS_VERSION,
 } from './actions';
 import { defaultState, PlaygroundContextType } from './context';
@@ -39,8 +41,12 @@ export const reducer: React.Reducer<PlaygroundContextType, PlaygroundContextActi
             return { ...state, phpVersion: action.payload };
         case SET_PLAYGROUND_CLIENT:
             return { ...state, playgroundClient: action.payload };
+        case SET_PLUGINS:
+            return { ...state, plugins: action.payload };
         case SET_SETTINGS_OPEN:
             return { ...state, settingsOpen: action.payload };
+        case SET_THEMES:
+            return { ...state, themes: action.payload };
         case SET_WORDPRESS_VERSION:
             return { ...state, wordPressVersion: action.payload };
         case SET_STATE:

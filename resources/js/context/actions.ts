@@ -11,7 +11,9 @@ export const SET_MULTISITE = 'SET_MULTISITE' as const;
 export const SET_OUTPUT = 'SET_OUTPUT' as const;
 export const SET_PHP_VERSION = 'SET_PHP_VERSION' as const;
 export const SET_PLAYGROUND_CLIENT = 'SET_PLAYGROUND_CLIENT' as const;
+export const SET_PLUGINS = 'SET_PLUGINS' as const;
 export const SET_SETTINGS_OPEN = 'SET_SETTINGS_OPEN' as const;
+export const SET_THEMES = 'SET_THEMES' as const;
 export const SET_WORDPRESS_VERSION = 'SET_WORDPRESS_VERSION' as const;
 export const SET_STATE = 'SET_STATE' as const;
 export const RESET = 'RESET' as const;
@@ -66,9 +68,19 @@ export const actionSetPlaygroundClient = (playgroundClient: PlaygroundClient) =>
     payload: playgroundClient,
 });
 
+export const actionSetPlugins = (plugins: PlaygroundContextType['plugins']) => ({
+    type: SET_PLUGINS,
+    payload: plugins,
+});
+
 export const actionSetSettingsOpen = (status: PlaygroundContextType['settingsOpen'] = true) => ({
     type: SET_SETTINGS_OPEN,
     payload: status,
+});
+
+export const actionSetThemes = (themes: PlaygroundContextType['themes']) => ({
+    type: SET_THEMES,
+    payload: themes,
 });
 
 export const actionSetWordPressVersion = (wordPressVersion: PlaygroundContextType['wordPressVersion']) => ({
@@ -96,7 +108,9 @@ export type PlaygroundContextAction =
     | ReturnType<typeof actionSetOutput>
     | ReturnType<typeof actionSetPhpVersion>
     | ReturnType<typeof actionSetPlaygroundClient>
+    | ReturnType<typeof actionSetPlugins>
     | ReturnType<typeof actionSetSettingsOpen>
+    | ReturnType<typeof actionSetThemes>
     | ReturnType<typeof actionSetWordPressVersion>
     | ReturnType<typeof actionSetState>
     | ReturnType<typeof actionReset>;

@@ -25,7 +25,12 @@ export function OutputPanel() {
     const showWelcome = code === DEFAULT_CODE;
 
     return (
-        <div className="flex h-full w-full flex-col overflow-hidden">
+        <div
+            // This panel keeps overflowing. The absolute positioning is needed
+            // to keep it on the right side of the screen. Maybe there is a
+            // better solution.
+            className="absolute top-0 right-0 bottom-0 flex w-1/2 flex-col overflow-hidden"
+        >
             <Tabs className="border-gray-100 pl-3 dark:border-gray-900 dark:bg-gray-950">
                 <Tab label="Output" onSelect={() => setTab('pre')} current={'pre' === tab} aria-controls="output-pre" />
                 <Tab label="HTML" onSelect={() => setTab('html')} current={'html' === tab} aria-controls="output-html" />

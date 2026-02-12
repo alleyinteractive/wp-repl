@@ -3,8 +3,6 @@ import { StepDefinition } from '@wp-playground/blueprints';
 import { startPlaygroundWeb } from '@wp-playground/client';
 import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
-import { Group, Panel, Separator } from 'react-resizable-panels';
-import { useMedia } from 'react-use';
 
 import { AlleyLogo } from '@/components/alley';
 import { ConsolePanel, EditorPanel, OutputPanel, SettingsPanel } from '@/components/playground/index';
@@ -26,7 +24,6 @@ export default function Playground() {
     const { state, dispatch } = usePlaygroundState();
     const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, ready, themes, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
-    const isDesktop = useMedia('(min-width: 1024px)', true);
 
     useEffect(() => {
         if (!ready) {
@@ -209,69 +206,40 @@ export default function Playground() {
                 </div>
             </header>
             <div className="flex h-full w-full flex-1 flex-col overflow-auto">
-                {isDesktop && (browserShowing || consoleShowing) ? (
-                    // Desktop with browser/console: vertical resizable layout
-                    <Group orientation="vertical" className="h-full w-full">
-                        <Panel defaultSize="50%" minSize="20%">
-                            <div className="flex h-full overflow-hidden">
-                                <Group orientation="horizontal" className="h-full w-full">
-                                    <Panel defaultSize="50%" minSize="20%">
-                                        <EditorPanel />
-                                    </Panel>
-                                    <Separator className="bg-border w-1 cursor-col-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
-                                    <Panel defaultSize="50%" minSize="20%">
-                                        <OutputPanel />
-                                    </Panel>
-                                </Group>
-                            </div>
-                        </Panel>
-                        <Separator className="bg-border h-1 cursor-row-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
-                        <Panel defaultSize="50%" minSize="20%">
-                            <div className="flex h-full w-full flex-row">
-                                <iframe
-                                    ref={iframe}
-                                    className={cn('h-full', {
-                                        hidden: !browserShowing,
-                                        'w-1/2': browserShowing && consoleShowing,
-                                        'w-full': browserShowing && !consoleShowing,
-                                    })}
-                                    id="wp"
-                                    title="WordPress Playground"
-                                />
-                                <ConsolePanel
-                                    className={cn('h-full', {
-                                        hidden: !consoleShowing,
-                                        'w-1/2': browserShowing && consoleShowing,
-                                        'w-full': !browserShowing && consoleShowing,
-                                    })}
-                                />
-                            </div>
-                        </Panel>
-                    </Group>
-                ) : isDesktop ? (
-                    // Desktop without browser/console: horizontal resizable layout only
-                    <div className="flex h-full overflow-hidden">
-                        <Group orientation="horizontal" className="h-full w-full">
-                            <Panel defaultSize={50} minSize={20}>
-                                <EditorPanel />
-                            </Panel>
-                            <Separator className="bg-border w-1 cursor-col-resize transition-colors hover:bg-blue-500 active:bg-blue-600" />
-                            <Panel defaultSize={50} minSize={20}>
-                                <OutputPanel />
-                            </Panel>
-                        </Group>
+                {/* Upper container for the textarea and output */}
+                <div
+                    className={cn('relative flex h-full flex-row overflow-hidden', {
+                        'lg:h-2/3 lg:border-b': browserShowing || consoleShowing,
+                        'lg:h-full': !browserShowing && !consoleShowing,
+                    })}
+                >
+                    <EditorPanel />
+                    <OutputPanel />
+                </div>
+
+                {/* Lower container for the iframe that will allow for a user to resize it to be taller */}
+                <div className={cn('flex flex-1 overflow-hidden', { hidden: !browserShowing && !consoleShowing })}>
+                    <div className="flex h-full w-full flex-row">
+                        <iframe
+                            ref={iframe}
+                            className={cn('hidden h-full lg:block', {
+                                'lg:hidden': !browserShowing,
+                                'lg:w-1/2': browserShowing && consoleShowing,
+                                'lg:w-full': browserShowing && !consoleShowing,
+                            })}
+                            id="wp"
+                            title="WordPress Playground"
+                        />
+                        <ConsolePanel
+                            className={cn('hidden', {
+                                'h-full lg:block': consoleShowing,
+                                'lg:hidden': !console,
+                                'lg:w-1/2': browserShowing && consoleShowing,
+                                'lg:w-full': !browserShowing && consoleShowing,
+                            })}
+                        />
                     </div>
-                ) : (
-                    // Mobile: stacked vertical layout (no resizing)
-                    <>
-                        <div className="flex h-1/2 w-full flex-col border-b">
-                            <EditorPanel />
-                        </div>
-                        <div className="flex h-1/2 w-full flex-col">
-                            <OutputPanel />
-                        </div>
-                    </>
-                )}
+                </div>
             </div>
             <SettingsPanel />
             <SharePopover />

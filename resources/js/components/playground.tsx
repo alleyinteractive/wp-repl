@@ -21,6 +21,9 @@ import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
 import { cn } from '@/lib/utils';
 
+// Timeout duration for Playground initialization (60 seconds)
+const PLAYGROUND_TIMEOUT_MS = 60000;
+
 /**
  * Sandbox Playground Application
  */
@@ -57,13 +60,13 @@ export default function Playground() {
         }
 
         const setupPlayground = async () => {
-            // Set a timeout for Playground initialization (60 seconds)
+            // Set a timeout for Playground initialization
             timeoutRef.current = setTimeout(() => {
                 if (!playgroundReadyRef.current) {
-                    console.error('WordPress Playground failed to load within 60 seconds');
+                    console.error(`WordPress Playground failed to load within ${PLAYGROUND_TIMEOUT_MS / 1000} seconds`);
                     dispatch(actionSetPlaygroundError(true));
                 }
-            }, 60000);
+            }, PLAYGROUND_TIMEOUT_MS);
 
             const steps: StepDefinition[] = [];
 

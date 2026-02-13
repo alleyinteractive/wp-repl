@@ -8,7 +8,7 @@ import { AlleyLogo } from '@/components/alley';
 import { ConsolePanel, EditorPanel, OutputPanel, SettingsPanel } from '@/components/playground/index';
 import { SharePopover } from '@/components/share';
 import { Button } from '@/components/ui/button';
-import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, DEFAULT_CODE } from '@/context';
+import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, actionSetPlaygroundReady, DEFAULT_CODE } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
@@ -95,6 +95,7 @@ export default function Playground() {
             await client.isReady();
 
             dispatch(actionSetPlaygroundClient(client));
+            dispatch(actionSetPlaygroundReady(true));
         };
 
         if (iframe.current) {

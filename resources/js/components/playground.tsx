@@ -5,10 +5,16 @@ import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
 
 import { AlleyLogo } from '@/components/alley';
-import { ConsolePanel, EditorPanel, OutputPanel, SettingsPanel } from '@/components/playground/index';
+import { ConsolePanel, EditorPanel, LoadingOverlay, OutputPanel, SettingsPanel } from '@/components/playground/index';
 import { SharePopover } from '@/components/share';
 import { Button } from '@/components/ui/button';
-import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, DEFAULT_CODE } from '@/context';
+import {
+    actionSetBrowserShowing,
+    actionSetConsoleShowing,
+    actionSetPlaygroundClient,
+    actionSetPlaygroundReady,
+    DEFAULT_CODE,
+} from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
@@ -22,8 +28,10 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, ready, themes, wordPressVersion } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, playgroundReady, ready, themes, wordPressVersion } =
+        state;
     const iframe = useRef<HTMLIFrameElement>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!ready) {
@@ -31,6 +39,14 @@ export default function Playground() {
         }
 
         const setupPlayground = async () => {
+            // Set a timeout for Playground initialization (60 seconds)
+            timeoutRef.current = setTimeout(() => {
+                if (!playgroundReady) {
+                    console.error('WordPress Playground failed to load within 60 seconds');
+                    dispatch(actionSetPlaygroundReady(false));
+                }
+            }, 60000);
+
             const steps: StepDefinition[] = [];
 
             // Add login step first to ensure user is authenticated before plugin/theme installation
@@ -94,13 +110,28 @@ export default function Playground() {
 
             await client.isReady();
 
+            // Clear the timeout since Playground loaded successfully
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+
             dispatch(actionSetPlaygroundClient(client));
+            dispatch(actionSetPlaygroundReady(true));
         };
 
         if (iframe.current) {
             setupPlayground();
         }
-    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]);
+
+        // Cleanup timeout on unmount
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = null;
+            }
+        };
+    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Run the playground client when it is ready.
     useEffect(() => {
@@ -138,6 +169,7 @@ export default function Playground() {
 
     return (
         <>
+            <LoadingOverlay />
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 shadow-xs md:px-4">
                 <div className="flex w-full items-center gap-2 break-words sm:gap-2.5">
                     <h1>

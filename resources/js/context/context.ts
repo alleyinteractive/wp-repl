@@ -42,6 +42,7 @@ export type PlaygroundContextType = {
     output?: string;
     phpVersion: SupportedPHPVersion | 'latest';
     playgroundClient?: PlaygroundClient;
+    playgroundReady: boolean;
     plugins: string[];
     ready: boolean;
     settingsOpen?: boolean;
@@ -60,6 +61,7 @@ export const defaultState: PlaygroundContextType = {
     output: undefined,
     phpVersion: DEFAULT_PHP_VERSION,
     playgroundClient: undefined,
+    playgroundReady: false,
     plugins: [],
     ready: false,
     settingsOpen: false,

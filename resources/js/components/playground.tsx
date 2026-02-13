@@ -44,6 +44,12 @@ export default function Playground() {
     } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const playgroundReadyRef = useRef(playgroundReady);
+
+    // Keep ref in sync with state
+    useEffect(() => {
+        playgroundReadyRef.current = playgroundReady;
+    }, [playgroundReady]);
 
     useEffect(() => {
         if (!ready) {
@@ -53,7 +59,7 @@ export default function Playground() {
         const setupPlayground = async () => {
             // Set a timeout for Playground initialization (60 seconds)
             timeoutRef.current = setTimeout(() => {
-                if (!playgroundReady) {
+                if (!playgroundReadyRef.current) {
                     console.error('WordPress Playground failed to load within 60 seconds');
                     dispatch(actionSetPlaygroundError(true));
                 }
@@ -143,7 +149,7 @@ export default function Playground() {
                 timeoutRef.current = null;
             }
         };
-    }, [dispatch, iframe, multisite, phpVersion, playgroundReady, plugins, ready, themes, wordPressVersion]);
+    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {

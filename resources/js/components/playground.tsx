@@ -8,13 +8,7 @@ import { AlleyLogo } from '@/components/alley';
 import { ConsolePanel, EditorPanel, LoadingOverlay, OutputPanel, SettingsPanel } from '@/components/playground/index';
 import { SharePopover } from '@/components/share';
 import { Button } from '@/components/ui/button';
-import {
-    actionSetBrowserShowing,
-    actionSetConsoleShowing,
-    actionSetPlaygroundClient,
-    actionSetPlaygroundReady,
-    DEFAULT_CODE,
-} from '@/context';
+import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, actionSetPlaygroundReady, DEFAULT_CODE } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
@@ -28,8 +22,19 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, playgroundReady, ready, themes, wordPressVersion } =
-        state;
+    const {
+        code,
+        browserShowing,
+        consoleShowing,
+        multisite,
+        phpVersion,
+        plugins,
+        playgroundClient,
+        playgroundReady,
+        ready,
+        themes,
+        wordPressVersion,
+    } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 

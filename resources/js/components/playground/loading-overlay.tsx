@@ -31,7 +31,7 @@ export function LoadingOverlay() {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
             <div className="mx-4 flex max-w-md flex-col items-center gap-4 text-center">
                 {!showError ? (
                     <>
@@ -43,12 +43,12 @@ export function LoadingOverlay() {
                     </>
                 ) : (
                     <>
-                        <AlertCircle className="h-12 w-12 text-destructive" />
+                        <AlertCircle className="text-destructive h-12 w-12" />
                         <div>
                             <h2 className="text-foreground mb-2 text-xl font-semibold">WordPress Playground Failed to Load</h2>
                             <p className="text-muted-foreground mb-4 text-sm">
-                                The WordPress Playground environment is taking longer than expected to load. This could be due to network issues or browser
-                                limitations.
+                                The WordPress Playground environment is taking longer than expected to load. This could be due to network issues or
+                                browser limitations.
                             </p>
                             <button
                                 onClick={() => window.location.reload()}

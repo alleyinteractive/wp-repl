@@ -11,6 +11,7 @@ export const SET_MULTISITE = 'SET_MULTISITE' as const;
 export const SET_OUTPUT = 'SET_OUTPUT' as const;
 export const SET_PHP_VERSION = 'SET_PHP_VERSION' as const;
 export const SET_PLAYGROUND_CLIENT = 'SET_PLAYGROUND_CLIENT' as const;
+export const SET_PLAYGROUND_ERROR = 'SET_PLAYGROUND_ERROR' as const;
 export const SET_PLAYGROUND_READY = 'SET_PLAYGROUND_READY' as const;
 export const SET_PLUGINS = 'SET_PLUGINS' as const;
 export const SET_SETTINGS_OPEN = 'SET_SETTINGS_OPEN' as const;
@@ -69,6 +70,11 @@ export const actionSetPlaygroundClient = (playgroundClient: PlaygroundClient) =>
     payload: playgroundClient,
 });
 
+export const actionSetPlaygroundError = (error: PlaygroundContextType['playgroundError'] = true) => ({
+    type: SET_PLAYGROUND_ERROR,
+    payload: error,
+});
+
 export const actionSetPlaygroundReady = (ready: PlaygroundContextType['playgroundReady'] = true) => ({
     type: SET_PLAYGROUND_READY,
     payload: ready,
@@ -114,6 +120,7 @@ export type PlaygroundContextAction =
     | ReturnType<typeof actionSetOutput>
     | ReturnType<typeof actionSetPhpVersion>
     | ReturnType<typeof actionSetPlaygroundClient>
+    | ReturnType<typeof actionSetPlaygroundError>
     | ReturnType<typeof actionSetPlaygroundReady>
     | ReturnType<typeof actionSetPlugins>
     | ReturnType<typeof actionSetSettingsOpen>

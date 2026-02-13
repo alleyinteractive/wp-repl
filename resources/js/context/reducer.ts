@@ -11,6 +11,7 @@ import {
     SET_OUTPUT,
     SET_PHP_VERSION,
     SET_PLAYGROUND_CLIENT,
+    SET_PLAYGROUND_ERROR,
     SET_PLAYGROUND_READY,
     SET_PLUGINS,
     SET_SETTINGS_OPEN,
@@ -42,6 +43,8 @@ export const reducer: React.Reducer<PlaygroundContextType, PlaygroundContextActi
             return { ...state, phpVersion: action.payload };
         case SET_PLAYGROUND_CLIENT:
             return { ...state, playgroundClient: action.payload };
+        case SET_PLAYGROUND_ERROR:
+            return { ...state, playgroundError: action.payload };
         case SET_PLAYGROUND_READY:
             return { ...state, playgroundReady: action.payload };
         case SET_PLUGINS:

@@ -8,7 +8,14 @@ import { AlleyLogo } from '@/components/alley';
 import { ConsolePanel, EditorPanel, LoadingOverlay, OutputPanel, SettingsPanel } from '@/components/playground/index';
 import { SharePopover } from '@/components/share';
 import { Button } from '@/components/ui/button';
-import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, actionSetPlaygroundReady, DEFAULT_CODE } from '@/context';
+import {
+    actionSetBrowserShowing,
+    actionSetConsoleShowing,
+    actionSetPlaygroundClient,
+    actionSetPlaygroundError,
+    actionSetPlaygroundReady,
+    DEFAULT_CODE,
+} from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
@@ -48,7 +55,7 @@ export default function Playground() {
             timeoutRef.current = setTimeout(() => {
                 if (!playgroundReady) {
                     console.error('WordPress Playground failed to load within 60 seconds');
-                    dispatch(actionSetPlaygroundReady(false));
+                    dispatch(actionSetPlaygroundError(true));
                 }
             }, 60000);
 
@@ -136,7 +143,7 @@ export default function Playground() {
                 timeoutRef.current = null;
             }
         };
-    }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [dispatch, iframe, multisite, phpVersion, playgroundReady, plugins, ready, themes, wordPressVersion]);
 
     // Run the playground client when it is ready.
     useEffect(() => {

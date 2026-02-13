@@ -1,30 +1,12 @@
 import { usePlaygroundState } from '@/context/hook';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 export function LoadingOverlay() {
     const { state } = usePlaygroundState();
-    const { playgroundReady, ready } = state;
-    const [showError, setShowError] = useState(false);
+    const { playgroundError, playgroundReady, ready } = state;
 
     // Show loading overlay only when ready is true but playgroundReady is false
     const showLoading = ready && !playgroundReady;
-
-    useEffect(() => {
-        if (!showLoading) {
-            setShowError(false);
-            return;
-        }
-
-        // If still loading after 60 seconds, show error
-        const timer = setTimeout(() => {
-            if (!playgroundReady) {
-                setShowError(true);
-            }
-        }, 60000);
-
-        return () => clearTimeout(timer);
-    }, [showLoading, playgroundReady]);
 
     if (!showLoading) {
         return null;
@@ -33,7 +15,7 @@ export function LoadingOverlay() {
     return (
         <div className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
             <div className="mx-4 flex max-w-md flex-col items-center gap-4 text-center">
-                {!showError ? (
+                {!playgroundError ? (
                     <>
                         <Loader2 className="text-primary h-12 w-12 animate-spin" />
                         <div>

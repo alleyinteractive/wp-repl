@@ -24,12 +24,13 @@ export function OutputPanel() {
     }, [output]);
 
     useEffect(() => {
+        // Only set up the timeout timer when Playground setup has started but not yet completed
         if (!ready || playgroundReady) {
             setPlaygroundError(false);
             return;
         }
 
-        // If still loading after 60 seconds, show error
+        // If still loading after 60 seconds, show error.
         const timer = setTimeout(() => {
             if (!playgroundReady) {
                 setPlaygroundError(true);

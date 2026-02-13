@@ -2,14 +2,15 @@ import { Tab, Tabs } from '@/components/tabs';
 import { WelcomePanel } from '@/components/welcome-panel';
 import { DEFAULT_CODE } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
-
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function OutputPanel() {
     const {
-        state: { output, loading, code },
+        state: { output, loading, code, playgroundReady, ready },
     } = usePlaygroundState();
     const [tab, setTab] = useState<'pre' | 'html'>('pre');
+    const [playgroundError, setPlaygroundError] = useState(false);
 
     useEffect(() => {
         // Check for HTML by looking for common tags, excluding <br> and <br/>
@@ -22,7 +23,24 @@ export function OutputPanel() {
         }
     }, [output]);
 
+    useEffect(() => {
+        if (!ready || playgroundReady) {
+            setPlaygroundError(false);
+            return;
+        }
+
+        // If still loading after 60 seconds, show error
+        const timer = setTimeout(() => {
+            if (!playgroundReady) {
+                setPlaygroundError(true);
+            }
+        }, 60000);
+
+        return () => clearTimeout(timer);
+    }, [ready, playgroundReady]);
+
     const showWelcome = code === DEFAULT_CODE;
+    const showPlaygroundLoading = ready && !playgroundReady;
 
     return (
         <div
@@ -62,10 +80,39 @@ export function OutputPanel() {
                 {'pre' === tab ? (
                     <>
                         <div className="dark:bg-background h-full overflow-auto px-3 pt-2">
-                            <pre id="output-pre">
-                                {output}
-                                {!loading && !output ? 'No output produced.' : null}
-                            </pre>
+                            {showPlaygroundLoading && !playgroundError ? (
+                                <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
+                                    <Loader2 className="mt-0.5 h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Preparing WordPress Playground...</h3>
+                                        <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                                            Setting up your WordPress environment. This may take a few moments.
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : playgroundError ? (
+                                <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30">
+                                    <AlertCircle className="mt-0.5 h-5 w-5 text-red-600 dark:text-red-400" />
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-red-900 dark:text-red-100">WordPress Playground Failed to Load</h3>
+                                        <p className="mt-1 text-xs text-red-700 dark:text-red-300">
+                                            The WordPress environment is taking longer than expected to load. This could be due to network issues or
+                                            browser limitations.
+                                        </p>
+                                        <button
+                                            onClick={() => window.location.reload()}
+                                            className="mt-2 rounded bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
+                                        >
+                                            Reload Page
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <pre id="output-pre">
+                                    {output}
+                                    {!loading && !output ? 'No output produced.' : null}
+                                </pre>
+                            )}
                         </div>
                     </>
                 ) : null}
@@ -80,7 +127,7 @@ export function OutputPanel() {
                         id="output-html"
                     />
                 ) : null}
-                {showWelcome && 'pre' === tab ? <WelcomePanel /> : null}
+                {showWelcome && 'pre' === tab && playgroundReady ? <WelcomePanel /> : null}
             </div>
         </div>
     );

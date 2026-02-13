@@ -5,24 +5,14 @@ import { cx } from 'class-variance-authority';
 import { useEffect, useRef, useTransition } from 'react';
 
 import { AlleyLogo } from '@/components/alley';
-import { ConsolePanel, EditorPanel, LoadingOverlay, OutputPanel, SettingsPanel } from '@/components/playground/index';
+import { ConsolePanel, EditorPanel, OutputPanel, SettingsPanel } from '@/components/playground/index';
 import { SharePopover } from '@/components/share';
 import { Button } from '@/components/ui/button';
-import {
-    actionSetBrowserShowing,
-    actionSetConsoleShowing,
-    actionSetPlaygroundClient,
-    actionSetPlaygroundError,
-    actionSetPlaygroundReady,
-    DEFAULT_CODE,
-} from '@/context';
+import { actionSetBrowserShowing, actionSetConsoleShowing, actionSetPlaygroundClient, actionSetPlaygroundReady, DEFAULT_CODE } from '@/context';
 import { usePlaygroundState } from '@/context/hook';
 import { usePage } from '@/hooks/use-page';
 import { useRunCode } from '@/hooks/use-run-code';
 import { cn } from '@/lib/utils';
-
-// Timeout duration for Playground initialization (60 seconds)
-const PLAYGROUND_TIMEOUT_MS = 60000;
 
 /**
  * Sandbox Playground Application
@@ -32,27 +22,8 @@ export default function Playground() {
     const page = usePage();
     const [sharing, startTransition] = useTransition();
     const { state, dispatch } = usePlaygroundState();
-    const {
-        code,
-        browserShowing,
-        consoleShowing,
-        multisite,
-        phpVersion,
-        plugins,
-        playgroundClient,
-        playgroundReady,
-        ready,
-        themes,
-        wordPressVersion,
-    } = state;
+    const { code, browserShowing, consoleShowing, multisite, phpVersion, plugins, playgroundClient, ready, themes, wordPressVersion } = state;
     const iframe = useRef<HTMLIFrameElement>(null);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const playgroundReadyRef = useRef(playgroundReady);
-
-    // Keep ref in sync with state
-    useEffect(() => {
-        playgroundReadyRef.current = playgroundReady;
-    }, [playgroundReady]);
 
     useEffect(() => {
         if (!ready) {
@@ -60,14 +31,6 @@ export default function Playground() {
         }
 
         const setupPlayground = async () => {
-            // Set a timeout for Playground initialization
-            timeoutRef.current = setTimeout(() => {
-                if (!playgroundReadyRef.current) {
-                    console.error(`WordPress Playground failed to load within ${PLAYGROUND_TIMEOUT_MS / 1000} seconds`);
-                    dispatch(actionSetPlaygroundError(true));
-                }
-            }, PLAYGROUND_TIMEOUT_MS);
-
             const steps: StepDefinition[] = [];
 
             // Add login step first to ensure user is authenticated before plugin/theme installation
@@ -131,12 +94,6 @@ export default function Playground() {
 
             await client.isReady();
 
-            // Clear the timeout since Playground loaded successfully
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-
             dispatch(actionSetPlaygroundClient(client));
             dispatch(actionSetPlaygroundReady(true));
         };
@@ -144,14 +101,6 @@ export default function Playground() {
         if (iframe.current) {
             setupPlayground();
         }
-
-        // Cleanup timeout on unmount
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-        };
     }, [dispatch, iframe, multisite, phpVersion, plugins, ready, themes, wordPressVersion]);
 
     // Run the playground client when it is ready.
@@ -190,7 +139,6 @@ export default function Playground() {
 
     return (
         <>
-            <LoadingOverlay />
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-6 shadow-xs md:px-4">
                 <div className="flex w-full items-center gap-2 break-words sm:gap-2.5">
                     <h1>

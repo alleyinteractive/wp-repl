@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { stripHtml, parseDocBlock } = require('./lib/stubs-helpers.cjs');
+const { stripHtml, parseDocBlock, extractParamSection } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/php-stubs/wordpress-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/wordpress-stubs');
@@ -80,9 +80,8 @@ for (let i = 0; i < lines.length; i++) {
         parenDepth += (nextLine.match(/\(/g) || []).length - (nextLine.match(/\)/g) || []).length;
     }
 
-    // Extract param string
-    const paramSectionMatch = fullLine.match(/^function\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\((.*?)\)/s);
-    const rawParams = paramSectionMatch ? paramSectionMatch[1] : '';
+    // Extract param string using balanced-paren helper
+    const rawParams = extractParamSection(fullLine);
 
     // Look backward for PHPDoc comment
     let docBlockLines = null;

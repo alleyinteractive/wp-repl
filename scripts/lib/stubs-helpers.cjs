@@ -17,12 +17,11 @@
 function stripHtml(text) {
     return text
         .replace(/<[^>]+>/g, ' ')
-        .replace(/&gt;/g, '>')
-        .replace(/&lt;/g, '<')
-        .replace(/&amp;/g, '&')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&quot;/g, '"')
-        .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+        .replace(/&(amp|gt|lt|nbsp|quot|#\d+);/g, (match, entity) => {
+            if (entity.startsWith('#')) return String.fromCharCode(parseInt(entity.slice(1), 10));
+            const map = { amp: '&', gt: '>', lt: '<', nbsp: ' ', quot: '"' };
+            return map[entity] ?? match;
+        })
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -65,7 +64,7 @@ function parseDocBlock(docLines) {
 
         const tagMatch = stripped.match(/^@([a-zA-Z]+)\s*(.*)/);
         if (tagMatch) {
-            if (currentTag !== undefined) {
+            if (currentTag !== null) {
                 logical.push({ tag: currentTag, text: currentText.trim() });
             }
             currentTag = tagMatch[1];
@@ -74,7 +73,7 @@ function parseDocBlock(docLines) {
             currentText += ' ' + stripped;
         }
     }
-    if (currentTag !== undefined) {
+    if (currentTag !== null) {
         logical.push({ tag: currentTag, text: currentText.trim() });
     }
 
@@ -111,4 +110,105 @@ function parseDocBlock(docLines) {
     return { description, paramDocs, returnType, returnDescription, docLink, since };
 }
 
-module.exports = { stripHtml, parseDocBlock };
+/**
+ * Extract the parameter section from a PHP function/method signature string.
+ * Uses balanced parenthesis matching instead of a simple regex to correctly
+ * handle PHP 8 attributes like #[LanguageLevelTypeAware(['8.0' => 'string'], default: '')].
+ *
+ * @param {string} signature  The full (possibly multi-line joined) function signature.
+ * @returns {string} The content between the outermost parentheses, or empty string.
+ */
+function extractParamSection(signature) {
+    const start = signature.indexOf('(');
+    if (start === -1) return '';
+
+    let depth = 0;
+    for (let i = start; i < signature.length; i++) {
+        if (signature[i] === '(') depth++;
+        else if (signature[i] === ')') {
+            depth--;
+            if (depth === 0) return signature.slice(start + 1, i);
+        }
+    }
+    return ''; // unbalanced – shouldn't happen in valid stubs
+}
+
+/**
+ * Extract the return type from a PHP function/method signature string.
+ * Looks for ': TypeName' after the outermost closing parenthesis.
+ *
+ * @param {string} signature
+ * @returns {string} The return type, or empty string.
+ */
+function extractReturnType(signature) {
+    // Find the last closing ) using balanced matching (same as extractParamSection)
+    const start = signature.indexOf('(');
+    if (start === -1) return '';
+
+    let depth = 0;
+    let closingParen = -1;
+    for (let i = start; i < signature.length; i++) {
+        if (signature[i] === '(') depth++;
+        else if (signature[i] === ')') {
+            depth--;
+            if (depth === 0) {
+                closingParen = i;
+                break;
+            }
+        }
+    }
+    if (closingParen === -1) return '';
+
+    const afterParen = signature.slice(closingParen + 1).trim();
+    const m = afterParen.match(/^:\s*([?A-Za-z_\\][A-Za-z0-9_|\\?]*(?:\|[A-Za-z0-9_\\?]+)*)/);
+    return m ? m[1] : '';
+}
+
+/**
+ * Parses a PHP parameter list string into structured param objects.
+ * Handles type hints, default values, variadic params, and nullable types.
+ * Also handles PHP 8 attributes (#[...]) between type/name.
+ *
+ * @param {string} rawParams
+ * @returns {Array<{name: string, optional: boolean}>}
+ */
+function parseParams(rawParams) {
+    if (!rawParams.trim()) return [];
+
+    // Split by comma but respect nested angle brackets, parens, and braces
+    const params = [];
+    let current = '';
+    let depth = 0;
+
+    for (const char of rawParams) {
+        if (char === '(' || char === '<' || char === '[' || char === '{') depth++;
+        else if (char === ')' || char === '>' || char === ']' || char === '}') depth--;
+        else if (char === ',' && depth === 0) {
+            params.push(current.trim());
+            current = '';
+            continue;
+        }
+        current += char;
+    }
+    if (current.trim()) params.push(current.trim());
+
+    return params
+        .map((p) => {
+            // Strip PHP 8 attributes (#[...]) that can appear before the param
+            const stripped = p.trim().replace(/#\[[^\]]*\]\s*/g, '');
+            if (!stripped) return null;
+
+            // Extract variable name — might be &$name, ...$name, $name, etc.
+            const varMatch = stripped.match(/\.\.\.\$([a-zA-Z_][a-zA-Z0-9_]*)|&?\$([a-zA-Z_][a-zA-Z0-9_]*)/);
+            if (!varMatch) return null;
+
+            const paramName = varMatch[1] || varMatch[2];
+            const hasDefault = stripped.includes('=');
+            const isVariadic = stripped.includes('...');
+
+            return { name: paramName, optional: hasDefault || isVariadic };
+        })
+        .filter(Boolean);
+}
+
+module.exports = { stripHtml, parseDocBlock, parseParams, extractParamSection, extractReturnType };

@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { stripHtml, parseDocBlock } = require('./lib/stubs-helpers.cjs');
+const { stripHtml, parseDocBlock, parseParams, extractParamSection } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/JetBrains/phpstorm-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/phpstorm-stubs');
@@ -148,11 +148,8 @@ function parseStubFile(filePath) {
             parenDepth += (nextLine.match(/\(/g) || []).length - (nextLine.match(/\)/g) || []).length;
         }
 
-        // Extract the params section from the full signature
-        const paramSectionMatch = fullSignature.match(
-            /^function\s+[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\s*\((.*?)\)/s,
-        );
-        const rawParams = paramSectionMatch ? paramSectionMatch[1] : '';
+        // Extract the params section from the full signature using balanced-paren helper
+        const rawParams = extractParamSection(fullSignature);
 
         // Look backward for PHPDoc comment.
         // phpstorm-stubs uses PHP 8 attributes (#[Pure], #[LanguageLevelTypeAware], etc.)
@@ -220,48 +217,6 @@ function parseStubFile(filePath) {
             functions.set(functionName, entry);
         }
     }
-}
-
-/**
- * Parses a PHP parameter list string into structured param objects.
- * Handles type hints, default values, variadic params, and nullable types.
- */
-function parseParams(rawParams) {
-    if (!rawParams.trim()) return [];
-
-    // Split by comma but respect nested angle brackets and parens
-    const params = [];
-    let current = '';
-    let depth = 0;
-
-    for (const char of rawParams) {
-        if (char === '(' || char === '<' || char === '[') depth++;
-        else if (char === ')' || char === '>' || char === ']') depth--;
-        else if (char === ',' && depth === 0) {
-            params.push(current.trim());
-            current = '';
-            continue;
-        }
-        current += char;
-    }
-    if (current.trim()) params.push(current.trim());
-
-    return params
-        .map((p) => {
-            const trimmed = p.trim();
-            if (!trimmed) return null;
-
-            // Extract variable name — might be &$name, ...$name, $name, etc.
-            const varMatch = trimmed.match(/\.\.\.\$([a-zA-Z_][a-zA-Z0-9_]*)|&?\$([a-zA-Z_][a-zA-Z0-9_]*)/);
-            if (!varMatch) return null;
-
-            const paramName = varMatch[1] || varMatch[2];
-            const hasDefault = trimmed.includes('=');
-            const isVariadic = trimmed.includes('...');
-
-            return { name: paramName, optional: hasDefault || isVariadic };
-        })
-        .filter(Boolean);
 }
 
 // Parse all stub files

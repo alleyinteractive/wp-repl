@@ -28,39 +28,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress -o -a --apcu-autoloader --ignore-platform-reqs
-
-      - name: Install Node Dependencies
-        run: npm ci
-
-      - name: Build Assets
-        run: npm run build
-
-      - name: Copy files via rsync
-        run: |
-          rsync -avz --delete . ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:${{ env.DEPLOY_DIR }} \
-            --exclude node_modules \
-            --exclude .npm \
-            --exclude .git \
-            --exclude tests \
-            --exclude database/database.sqlite \
-            --exclude storage/backups \
-            --exclude storage/debugbar \
-            --exclude .env
-
-      - name: Execute remote commands
-        run: |
-          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} "cd ${{ env.DEPLOY_DIR }} && \
-          export PATH=/usr/local/bin:\$PATH && \
-          php8.4 artisan migrate --force && \
-          php8.4 artisan optimize:clear && php8.4 artisan optimize"
-
       - name: Purge Cloudflare Cache
         run: |
           curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \

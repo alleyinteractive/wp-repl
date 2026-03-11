@@ -6,8 +6,9 @@
 /**
  * Generate PHP native function data from JetBrains phpstorm-stubs.
  *
- * This script parses phpstorm-stubs PHP files and extracts global function signatures,
- * descriptions, and documentation links for Monaco editor autocomplete.
+ * This script parses phpstorm-stubs PHP files and extracts global function
+ * signatures, PHPDoc descriptions, parameter types, return types, and
+ * documentation links for Monaco editor autocomplete.
  *
  * Usage:
  *   npm run generate:php-functions
@@ -15,13 +16,14 @@
  * The script will:
  * 1. Clone/update the phpstorm-stubs repository
  * 2. Parse all PHP stub files for global function declarations
- * 3. Extract function names, signatures, and PHPDoc comments
+ * 3. Extract function names, signatures, PHPDoc comments, param types, and return info
  * 4. Generate resources/js/data/php-functions.json
  */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { stripHtml, parseDocBlock } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/JetBrains/phpstorm-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/phpstorm-stubs');
@@ -99,12 +101,10 @@ function parseStubFile(filePath) {
 
         // Track class/interface/trait context
         if (/^(class|interface|trait|abstract\s+class|final\s+class)\s+/.test(trimmed)) {
-            // Opening brace might be on this line or the next
             const openOnSameLine = trimmed.includes('{');
             if (openOnSameLine) {
                 classDepth = braceDepth + 1;
             } else {
-                // Look for opening brace on next line(s)
                 for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
                     if (lines[j].includes('{')) {
                         classDepth = braceDepth + 1;
@@ -119,32 +119,28 @@ function parseStubFile(filePath) {
             if (char === '{') braceDepth++;
             else if (char === '}') {
                 braceDepth--;
-                // If we've exited the class context
                 if (classDepth !== null && braceDepth < classDepth) {
                     classDepth = null;
                 }
             }
         }
 
-        // Only look for functions when we're NOT inside a class
+        // Only look for functions when NOT inside a class
         if (classDepth !== null) continue;
 
-        // Match function declarations — handle both single-line and beginning of multi-line
-        // We look for: function name( ... ) optionally with return type, ending with { or ;
         const funcMatch = trimmed.match(/^function\s+([a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*)\s*\(/);
         if (!funcMatch) continue;
 
         const functionName = funcMatch[1];
 
-        // Skip PHP magic functions and internal-looking functions
+        // Skip PHP magic functions
         if (functionName.startsWith('__')) continue;
 
-        // Collect the full function signature (may span multiple lines due to params)
+        // Collect the full function signature (may span multiple lines)
         let fullSignature = trimmed;
         let j = i;
-
-        // If the opening paren isn't closed on this line, look ahead
-        let parenDepth = (fullSignature.match(/\(/g) || []).length - (fullSignature.match(/\)/g) || []).length;
+        let parenDepth =
+            (fullSignature.match(/\(/g) || []).length - (fullSignature.match(/\)/g) || []).length;
         while (parenDepth > 0 && j < Math.min(i + 20, lines.length - 1)) {
             j++;
             const nextLine = lines[j].trim();
@@ -153,59 +149,75 @@ function parseStubFile(filePath) {
         }
 
         // Extract the params section from the full signature
-        const paramSectionMatch = fullSignature.match(/^function\s+[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\s*\((.*?)\)/s);
+        const paramSectionMatch = fullSignature.match(
+            /^function\s+[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*\s*\((.*?)\)/s,
+        );
         const rawParams = paramSectionMatch ? paramSectionMatch[1] : '';
 
-        // Look backward for PHPDoc comment
-        let shortDescription = '';
-        let docLink = '';
+        // Look backward for PHPDoc comment.
+        // phpstorm-stubs uses PHP 8 attributes (#[Pure], #[LanguageLevelTypeAware], etc.)
+        // between the PHPDoc closing */ and the function keyword — skip those lines.
+        let docBlockLines = null;
 
         for (let k = i - 1; k >= 0 && k >= i - 100; k--) {
             const prevLine = lines[k].trim();
 
-            if (prevLine === '/**') {
-                for (let m = k + 1; m < i; m++) {
-                    const docLine = lines[m].trim();
+            // PHP 8 attribute — skip and keep scanning upward
+            if (prevLine.startsWith('#[')) continue;
 
-                    // First non-tag, non-empty line is the short description
-                    if (docLine.startsWith('*') && !docLine.startsWith('* @') && !shortDescription) {
-                        const text = docLine.replace(/^\*\s*/, '').trim();
-                        if (text && text !== '/') {
-                            shortDescription = text;
-                        }
-                    }
-
-                    // Extract @link for documentation URL
-                    const linkMatch = docLine.match(/^\*\s*@link\s+(https?:\/\/\S+)/);
-                    if (linkMatch && !docLink) {
-                        docLink = linkMatch[1];
+            if (prevLine === '*/') {
+                // Found the closing */ of a PHPDoc block — scan backward to find the opening /**
+                for (let m = k - 1; m >= 0 && m >= k - 200; m--) {
+                    if (lines[m].trim() === '/**') {
+                        docBlockLines = lines.slice(m + 1, k + 1);
+                        break;
                     }
                 }
                 break;
             }
 
-            // Stop scanning backwards if we hit non-comment content
-            if (!prevLine.startsWith('*') && prevLine !== '' && prevLine !== '/') {
+            // Stop if we hit something that's neither blank nor a comment continuation
+            if (prevLine !== '' && !prevLine.startsWith('*')) {
                 break;
             }
         }
 
-        // Parse the parameter list into structured data
+        // Parse the parameter list from the function signature
         const paramList = parseParams(rawParams);
 
-        // Build snippet signature for Monaco
-        const signature = paramList
-            .map((p, idx) => `\${${idx + 1}:${p.name}}`)
-            .join(', ');
+        // Parse PHPDoc block and merge type/description data into params
+        let description = '';
+        let returnType = '';
+        let returnDescription = '';
+        let docLink = '';
+
+        if (docBlockLines) {
+            const doc = parseDocBlock(docBlockLines);
+            description = doc.description;
+            returnType = doc.returnType;
+            returnDescription = doc.returnDescription;
+            docLink = doc.docLink;
+
+            // Enrich params with type and description from PHPDoc
+            for (const param of paramList) {
+                const docParam = doc.paramDocs.get(param.name);
+                if (docParam) {
+                    if (docParam.type) param.type = docParam.type;
+                    if (docParam.description) param.description = docParam.description;
+                }
+            }
+        }
 
         if (!functions.has(functionName)) {
-            functions.set(functionName, {
+            const entry = {
                 name: functionName,
-                signature,
-                description: shortDescription || `PHP function ${functionName}`,
+                description: description || `PHP function ${functionName}`,
                 params: paramList,
-                docLink: docLink || null,
-            });
+            };
+            if (returnType) entry.returnType = returnType;
+            if (returnDescription) entry.returnDescription = returnDescription;
+            if (docLink) entry.docLink = docLink;
+            functions.set(functionName, entry);
         }
     }
 }
@@ -217,7 +229,7 @@ function parseStubFile(filePath) {
 function parseParams(rawParams) {
     if (!rawParams.trim()) return [];
 
-    // Split by comma but respect nested angle brackets (generics in type hints) and parens
+    // Split by comma but respect nested angle brackets and parens
     const params = [];
     let current = '';
     let depth = 0;
@@ -273,9 +285,12 @@ console.log(`   ✓ Written to ${path.relative(process.cwd(), OUTPUT_FILE)}\n`);
 
 // Show sample functions
 console.log('📋 Sample functions:');
-const samples = functionsArray.filter((f) => ['array_map', 'str_replace', 'json_encode', 'preg_match', 'sprintf'].includes(f.name));
+const samples = functionsArray.filter((f) =>
+    ['array_map', 'str_replace', 'json_encode', 'preg_match', 'sprintf'].includes(f.name),
+);
 samples.forEach((f) => {
-    console.log(`   - ${f.name}(${f.params.map((p) => p.name).join(', ')})`);
+    console.log(`   - ${f.name}(${f.params.map((p) => (p.type ? `${p.type} $${p.name}` : `$${p.name}`)).join(', ')})`);
+    if (f.returnType) console.log(`     returns: ${f.returnType}`);
     console.log(`     ${f.description.substring(0, 80)}`);
 });
 

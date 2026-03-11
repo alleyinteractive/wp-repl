@@ -1,70 +1,94 @@
-# WordPress Functions Generator
+# Autocomplete Data Generators
 
-This script generates autocomplete data for WordPress core functions by parsing the official [php-stubs/wordpress-stubs](https://github.com/php-stubs/wordpress-stubs) repository.
+These scripts generate autocomplete data for the Monaco PHP editor by parsing official PHP and WordPress stub files.
 
-## Usage
+## Scripts
 
-To regenerate the WordPress functions data file:
+### `generate:php-functions`
+
+Generates native PHP function data from [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs).
+
+```bash
+npm run generate:php-functions
+```
+
+### `generate:wordpress-functions`
+
+Generates WordPress core function data from [php-stubs/wordpress-stubs](https://github.com/php-stubs/wordpress-stubs).
 
 ```bash
 npm run generate:wordpress-functions
 ```
 
-This will:
-1. Clone or update the wordpress-stubs repository to `.tmp/wordpress-stubs`
-2. Parse `wordpress-stubs.php` to extract function signatures and PHPDoc comments
-3. Generate `resources/js/data/wordpress-functions.json` with ~3,900 WordPress functions
-
-## When to Regenerate
-
-You should regenerate the functions data when:
-- A new major WordPress version is released
-- You want to update the autocomplete with the latest WordPress functions
-- The wordpress-stubs repository has been updated with new functions
-
 ## What's Generated
 
-The generated JSON file contains:
-- **name**: Function name (e.g., `get_option`)
-- **signature**: Parameter snippet with placeholders (e.g., `${1:option}, ${2:default_value}`)
-  - Note: Parameter names don't include `$` prefix in placeholders to ensure Monaco displays them correctly
+Both scripts output JSON files to `resources/js/data/` that are committed to git.
+This means **no internet access is required** when running `npm run build` in CI.
+
+Each function entry contains:
+
+- **name**: Function name (e.g., `get_option`, `array_map`)
 - **description**: Short description from PHPDoc
-- **params**: Array of parameter objects with `name` and `optional` fields
-- **since**: WordPress version when function was introduced (e.g., `2.1.0`)
+- **params**: Array of parameter objects:
+  - `name` — parameter name (without `$`)
+  - `type` — PHP type (e.g., `string`, `int|false`, `callable|null`) — from `@param`
+  - `description` — parameter description — from `@param`
+  - `optional` — whether the parameter has a default value
+- **returnType**: Return type (e.g., `mixed`, `string|false`) — from `@return`
+- **returnDescription**: Return value description — from `@return`
+- **docLink**: URL to official documentation
+- **since** *(WordPress only)*: WordPress version when function was introduced
 
 ## Example Output
 
 ```json
 {
-  "name": "get_option",
-  "signature": "${1:option}, ${2:default_value}",
-  "description": "Retrieves an option value based on an option name.",
-  "params": [
-    { "name": "option", "optional": false },
-    { "name": "default_value", "optional": true }
-  ],
-  "since": "1.5.0"
+    "name": "get_option",
+    "description": "Retrieves an option value based on an option name.",
+    "params": [
+        {
+            "name": "option",
+            "type": "string",
+            "description": "Name of the option to retrieve.",
+            "optional": false
+        },
+        {
+            "name": "default_value",
+            "type": "mixed",
+            "description": "Default value to return if the option does not exist.",
+            "optional": true
+        }
+    ],
+    "returnType": "mixed",
+    "returnDescription": "Value of the option.",
+    "docLink": "https://developer.wordpress.org/reference/functions/get_option/",
+    "since": "1.5.0"
 }
 ```
 
-## Snippet Format
+## When to Regenerate
 
-The signature uses Monaco editor snippet syntax:
-- `${1:option}` = Tab stop 1 with placeholder text "option"
-- `${2:default_value}` = Tab stop 2 with placeholder text "default_value"
+Regenerate the data files when:
+- A new major PHP or WordPress version is released
+- The upstream stub repositories are updated with new or changed functions
 
-When the user selects the autocomplete, they see:
-```php
-get_option(option, default_value)
+The `.tmp/` directory is git-ignored and used as a local cache for subsequent runs.
+
+## Architecture
+
+The generated JSON files feed into the completions system at `resources/js/lib/completions/`.
+
+- `completions/types.ts` — `PhpFunction` / `PhpParam` TypeScript interfaces
+- `completions/registry.ts` — `CompletionRegistry` singleton; call `register(sourceId, fns)` to add data
+- `completions/sources/php.ts` — loads `php-functions.json` into the registry
+- `completions/sources/wordpress.ts` — loads `wordpress-functions.json` into the registry
+- `completions/providers/` — Monaco `CompletionItemProvider`, `HoverProvider`, `SignatureHelpProvider`
+- `completions/index.ts` — `setupCompletions(monaco)` entry point called from `editor.tsx`
+
+To add completions for a Composer library at runtime:
+
+```typescript
+import { completionRegistry } from '@/lib/completions';
+completionRegistry.register('vendor/package', packageFunctions);
 ```
 
-They can then tab through each parameter, and typing replaces the placeholder text.
-
-## Maintenance
-
-The script is designed to be:
-- **Self-contained**: No external dependencies beyond Node.js built-ins
-- **Idempotent**: Safe to run multiple times
-- **Fast**: Uses shallow clone for quick updates
-
-The `.tmp/wordpress-stubs` directory is git-ignored and used as a cache for subsequent runs.

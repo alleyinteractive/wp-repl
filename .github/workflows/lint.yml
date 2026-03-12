@@ -32,6 +32,9 @@ jobs:
       - name: Run Pint
         run: vendor/bin/pint
 
+      - name: Build Assets
+        run: npm run build
+
       - name: Format Frontend
         run: npm run format:check
 

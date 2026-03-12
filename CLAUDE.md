@@ -61,6 +61,7 @@ npm run format:check      # Prettier check only
 - **State management**: React Context + reducer pattern in `resources/js/context/` (context.ts, reducer.ts, actions.ts, provider.tsx, hook.ts via `usePlaygroundState`)
 - **Code execution**: `resources/js/hooks/use-run-code.ts` — validates code starts with `<?php`, auto-injects `wp-load.php`, runs via WordPress Playground client, tracks execution time
 - **WordPress Playground**: Runs in an iframe via `@wp-playground/client`. CLI SAPI mode, networking enabled, configurable PHP/WP versions, multisite support.
+- **Monaco completions**: `resources/js/lib/completions/` — PHP/WordPress autocomplete, hover docs, and signature help. Two registries: `completionRegistry` (functions) and `classRegistry` (classes/methods). `setupCompletions()` is called once in the editor `beforeMount` hook. Add new completion sources by calling `completionRegistry.register()` or `classRegistry.register()` at runtime.
 - **UI components**: shadcn/ui with Radix UI primitives in `resources/js/components/ui/`
 - **Path alias**: `@/*` maps to `resources/js/*`
 - **Ziggy**: Provides type-safe Laravel route helpers in TypeScript

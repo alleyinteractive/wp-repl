@@ -1,70 +1,187 @@
-# WordPress Functions Generator
+# Autocomplete Data Generators
 
-This script generates autocomplete data for WordPress core functions by parsing the official [php-stubs/wordpress-stubs](https://github.com/php-stubs/wordpress-stubs) repository.
+These scripts generate autocomplete data for the Monaco PHP editor by parsing official PHP and WordPress stub files.
 
-## Usage
+## Scripts
 
-To regenerate the WordPress functions data file:
+### `generate:php-functions`
+
+Generates native PHP function data from [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs).
+
+```bash
+npm run generate:php-functions
+```
+
+### `generate:php-classes`
+
+Generates native PHP class data (including constructors and methods) from [JetBrains/phpstorm-stubs](https://github.com/JetBrains/phpstorm-stubs).
+
+```bash
+npm run generate:php-classes
+```
+
+### `generate:wordpress-functions`
+
+Generates WordPress core function data from [php-stubs/wordpress-stubs](https://github.com/php-stubs/wordpress-stubs).
 
 ```bash
 npm run generate:wordpress-functions
 ```
 
-This will:
-1. Clone or update the wordpress-stubs repository to `.tmp/wordpress-stubs`
-2. Parse `wordpress-stubs.php` to extract function signatures and PHPDoc comments
-3. Generate `resources/js/data/wordpress-functions.json` with ~3,900 WordPress functions
+### `generate:wordpress-classes`
 
-## When to Regenerate
+Generates WordPress core class data (including constructors and methods) from [php-stubs/wordpress-stubs](https://github.com/php-stubs/wordpress-stubs).
 
-You should regenerate the functions data when:
-- A new major WordPress version is released
-- You want to update the autocomplete with the latest WordPress functions
-- The wordpress-stubs repository has been updated with new functions
+```bash
+npm run generate:wordpress-classes
+```
+
+### Run all at once
+
+```bash
+npm run generate
+```
+
+The `npm run build` command automatically runs all generators before bundling.
 
 ## What's Generated
 
-The generated JSON file contains:
-- **name**: Function name (e.g., `get_option`)
-- **signature**: Parameter snippet with placeholders (e.g., `${1:option}, ${2:default_value}`)
-  - Note: Parameter names don't include `$` prefix in placeholders to ensure Monaco displays them correctly
-- **description**: Short description from PHPDoc
-- **params**: Array of parameter objects with `name` and `optional` fields
-- **since**: WordPress version when function was introduced (e.g., `2.1.0`)
+All scripts output JSON files to `resources/js/data/` (git-ignored, regenerated at build time).
+This means **no internet access is required** after the first run — the `.tmp/` cache is reused.
+
+### Function schema
+
+Each function entry (`php-functions.json`, `wordpress-functions.json`):
+
+| Field               | Type         | Description                           |
+| ------------------- | ------------ | ------------------------------------- |
+| `name`              | `string`     | Function name, e.g. `array_map`       |
+| `description`       | `string`     | Short description from PHPDoc         |
+| `params`            | `PhpParam[]` | Parameter list (see below)            |
+| `returnType`        | `string?`    | PHP return type, e.g. `string\|false` |
+| `returnDescription` | `string?`    | Return value description              |
+| `docLink`           | `string?`    | URL to official docs                  |
+| `since`             | `string?`    | WordPress version _(WP only)_         |
+
+### Class schema
+
+Each class entry (`php-classes.json`, `wordpress-classes.json`):
+
+| Field               | Type          | Description                      |
+| ------------------- | ------------- | -------------------------------- |
+| `name`              | `string`      | Class name, e.g. `DOMDocument`   |
+| `description`       | `string`      | Short description from PHPDoc    |
+| `constructorParams` | `PhpParam[]`  | `__construct` parameters         |
+| `methods`           | `PhpMethod[]` | Public instance + static methods |
+| `docLink`           | `string?`     | URL to official docs             |
+
+### PhpParam schema
+
+| Field         | Type      | Description                           |
+| ------------- | --------- | ------------------------------------- |
+| `name`        | `string`  | Parameter name (without `$`)          |
+| `type`        | `string?` | PHP type, e.g. `string`, `int\|false` |
+| `description` | `string?` | Parameter description                 |
+| `optional`    | `boolean` | Whether the param has a default value |
+
+### PhpMethod schema
+
+| Field               | Type         | Description                  |
+| ------------------- | ------------ | ---------------------------- |
+| `name`              | `string`     | Method name                  |
+| `description`       | `string`     | Short description            |
+| `params`            | `PhpParam[]` | Parameter list               |
+| `returnType`        | `string?`    | Return type                  |
+| `returnDescription` | `string?`    | Return value description     |
+| `docLink`           | `string?`    | URL to official docs         |
+| `isStatic`          | `boolean?`   | Whether it's a static method |
 
 ## Example Output
 
 ```json
 {
-  "name": "get_option",
-  "signature": "${1:option}, ${2:default_value}",
-  "description": "Retrieves an option value based on an option name.",
-  "params": [
-    { "name": "option", "optional": false },
-    { "name": "default_value", "optional": true }
-  ],
-  "since": "1.5.0"
+    "name": "DOMDocument",
+    "description": "The DOMDocument class represents an entire HTML or XML document.",
+    "constructorParams": [
+        { "name": "version", "type": "string", "optional": true },
+        { "name": "encoding", "type": "string", "optional": true }
+    ],
+    "methods": [
+        {
+            "name": "createElement",
+            "description": "Create new element node",
+            "params": [
+                { "name": "localName", "type": "string", "optional": false },
+                { "name": "value", "type": "string", "optional": true }
+            ],
+            "returnType": "DOMElement|false",
+            "docLink": "https://php.net/manual/en/domdocument.createelement.php"
+        }
+    ],
+    "docLink": "https://php.net/manual/en/class.domdocument.php"
 }
 ```
 
-## Snippet Format
+## When to Regenerate
 
-The signature uses Monaco editor snippet syntax:
-- `${1:option}` = Tab stop 1 with placeholder text "option"
-- `${2:default_value}` = Tab stop 2 with placeholder text "default_value"
+Regenerate the data files when:
 
-When the user selects the autocomplete, they see:
-```php
-get_option(option, default_value)
+- A new major PHP or WordPress version is released
+- The upstream stub repositories are updated
+
+The `.tmp/` directory is git-ignored and used as a local cache for subsequent runs.
+
+## Architecture
+
+The generated JSON files feed into the completions system at `resources/js/lib/completions/`.
+
+### TypeScript types
+
+- `completions/types.ts` — `PhpFunction`, `PhpParam`, `PhpClass`, `PhpMethod` interfaces
+
+### Registries
+
+- `completions/registry.ts` — `CompletionRegistry` singleton for functions
+- `completions/class-registry.ts` — `ClassRegistry` singleton for classes
+
+### Data sources
+
+- `completions/sources/php.ts` — loads `php-functions.json`
+- `completions/sources/wordpress.ts` — loads `wordpress-functions.json`
+- `completions/sources/php-classes.ts` — loads `php-classes.json`
+- `completions/sources/wordpress-classes.ts` — loads `wordpress-classes.json`
+
+### Monaco providers
+
+- `completions/providers/completion.ts` — function autocomplete popup
+- `completions/providers/class-completion.ts` — class / method autocomplete (`new`, `->`, `::`)
+- `completions/providers/hover.ts` — hover docs for functions, classes, and methods
+- `completions/providers/signature-help.ts` — inline parameter hints for functions, constructors, and methods
+
+### Entry point
+
+- `completions/index.ts` — `setupCompletions(monaco)` called from `editor.tsx`
+
+## Extending at runtime
+
+To add completions for a Composer library:
+
+```typescript
+import { completionRegistry, classRegistry } from '@/lib/completions';
+
+// Add functions
+completionRegistry.register('vendor/package', packageFunctions);
+
+// Add classes
+classRegistry.register('vendor/package', packageClasses);
 ```
 
-They can then tab through each parameter, and typing replaces the placeholder text.
+## Shared parsing helpers
 
-## Maintenance
+`scripts/lib/stubs-helpers.cjs` contains utilities shared across all generators:
 
-The script is designed to be:
-- **Self-contained**: No external dependencies beyond Node.js built-ins
-- **Idempotent**: Safe to run multiple times
-- **Fast**: Uses shallow clone for quick updates
-
-The `.tmp/wordpress-stubs` directory is git-ignored and used as a cache for subsequent runs.
+- `stripHtml(text)` — strips HTML tags and decodes entities from PHPDoc
+- `parseDocBlock(lines)` — parses a `/** ... */` block into structured fields
+- `parseParams(rawParams)` — splits a PHP parameter list string into objects
+- `extractParamSection(signature)` — balanced-parenthesis extraction of the param section
+- `extractReturnType(signature)` — extracts `: ReturnType` from after the closing `)`

@@ -7,8 +7,8 @@
  * Generate WordPress functions data from wordpress-stubs
  *
  * This script parses the wordpress-stubs.php file from php-stubs/wordpress-stubs
- * and extracts function signatures, descriptions, and generates completion data
- * for Monaco editor autocomplete.
+ * and extracts function signatures, descriptions, parameter types, return types,
+ * and documentation links for Monaco editor autocomplete.
  *
  * Usage:
  *   npm run generate:wordpress-functions
@@ -16,13 +16,14 @@
  * The script will:
  * 1. Clone/update the wordpress-stubs repository
  * 2. Parse the wordpress-stubs.php file
- * 3. Extract function names, signatures, and PHPDoc comments
+ * 3. Extract function names, signatures, PHPDoc comments, param types, and return info
  * 4. Generate resources/js/data/wordpress-functions.json
  */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const { parseDocBlock, extractParamSection } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/php-stubs/wordpress-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/wordpress-stubs');
@@ -56,90 +57,93 @@ const lines = stubsContent.split('\n');
 
 const functions = new Map();
 
-// Look for PHPDoc comments followed by function declarations
 for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Check if this is a function declaration at the top level (4 spaces indentation)
-    const functionMatch = line.match(/^\s{4}function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\((.*?)\)/);
+    // Check if this is a function declaration at the top level (4-space indentation)
+    const functionStartMatch = line.match(/^\s{4}function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/);
+    if (!functionStartMatch) continue;
 
-    if (functionMatch) {
-        const functionName = functionMatch[1];
-        const params = functionMatch[2];
+    const functionName = functionStartMatch[1];
 
-        // Skip magic methods
-        if (functionName.startsWith('__')) continue;
+    // Skip magic methods
+    if (functionName.startsWith('__')) continue;
 
-        // Look backward for PHPDoc comment
-        let shortDescription = '';
-        let since = '';
+    // Collect the full function signature (may span multiple lines)
+    let fullLine = line.trim();
+    let j = i;
+    let parenDepth = (fullLine.match(/\(/g) || []).length - (fullLine.match(/\)/g) || []).length;
+    while (parenDepth > 0 && j < Math.min(i + 20, lines.length - 1)) {
+        j++;
+        const nextLine = lines[j].trim();
+        fullLine += ' ' + nextLine;
+        parenDepth += (nextLine.match(/\(/g) || []).length - (nextLine.match(/\)/g) || []).length;
+    }
 
-        for (let j = i - 1; j >= 0 && j >= i - 100; j--) {
-            const prevLine = lines[j].trim();
+    // Extract param string using balanced-paren helper
+    const rawParams = extractParamSection(fullLine);
 
-            if (prevLine === '/**') {
-                // Found start of PHPDoc, extract short description and @since
-                for (let k = j + 1; k < i; k++) {
-                    const docLine = lines[k].trim();
-
-                    // Extract short description (first non-empty line after /**)
-                    if (docLine.startsWith('*') && !docLine.startsWith('* @') && !shortDescription) {
-                        const text = docLine.replace(/^\*\s*/, '');
-                        if (text) {
-                            shortDescription = text;
-                        }
-                    }
-
-                    // Extract @since version
-                    const sinceMatch = docLine.match(/^\*\s*@since\s+([\d.]+)/);
-                    if (sinceMatch && !since) {
-                        since = sinceMatch[1];
-                    }
+    // Look backward for PHPDoc comment
+    let docBlockLines = null;
+    for (let k = i - 1; k >= 0 && k >= i - 100; k--) {
+        const prevLine = lines[k].trim();
+        if (prevLine === '*/') {
+            for (let m = k - 1; m >= 0 && m >= k - 200; m--) {
+                if (lines[m].trim() === '/**') {
+                    docBlockLines = lines.slice(m + 1, k + 1);
+                    break;
                 }
-                break;
             }
+            break;
+        }
+        if (!prevLine.startsWith('*') && prevLine !== '') break;
+    }
 
-            if (!prevLine.startsWith('*') && prevLine !== '') {
-                // Not part of a doc comment
-                break;
+    // Parse parameter list from function signature
+    const paramList = rawParams
+        .split(',')
+        .map((p) => {
+            const trimmed = p.trim();
+            if (!trimmed) return null;
+            const paramMatch = trimmed.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/);
+            if (!paramMatch) return null;
+            return { name: paramMatch[1], optional: trimmed.includes('=') };
+        })
+        .filter(Boolean);
+
+    // Parse PHPDoc and merge into param list
+    let description = '';
+    let returnType = '';
+    let returnDescription = '';
+    let since = '';
+
+    if (docBlockLines) {
+        const doc = parseDocBlock(docBlockLines);
+        description = doc.description;
+        returnType = doc.returnType;
+        returnDescription = doc.returnDescription;
+        since = doc.since;
+
+        for (const param of paramList) {
+            const docParam = doc.paramDocs.get(param.name);
+            if (docParam) {
+                if (docParam.type) param.type = docParam.type;
+                if (docParam.description) param.description = docParam.description;
             }
         }
+    }
 
-        // Parse parameters
-        const paramList = params
-            .split(',')
-            .map((p) => {
-                const trimmed = p.trim();
-                if (!trimmed) return null;
-
-                const paramMatch = trimmed.match(/\$([a-zA-Z_][a-zA-Z0-9_]*)/);
-                if (paramMatch) {
-                    const paramName = paramMatch[1];
-                    const hasDefault = trimmed.includes('=');
-                    return { name: paramName, optional: hasDefault };
-                }
-                return null;
-            })
-            .filter(Boolean);
-
-        // Build signature for snippet
-        // Note: We don't include $ in the placeholder text to avoid Monaco treating it as a variable
-        const signature = paramList
-            .map((p, idx) => {
-                return `\${${idx + 1}:${p.name}}`;
-            })
-            .join(', ');
-
-        // Store function info (deduplicate by keeping first occurrence)
-        if (!functions.has(functionName)) {
-            functions.set(functionName, {
-                name: functionName,
-                signature: signature,
-                description: shortDescription || `WordPress function ${functionName}`,
-                params: paramList,
-                since: since || null,
-            });
-        }
+    if (!functions.has(functionName)) {
+        const entry = {
+            name: functionName,
+            description: description || `WordPress function ${functionName}`,
+            params: paramList,
+            docLink: `https://developer.wordpress.org/reference/functions/${functionName}/`,
+        };
+        if (returnType) entry.returnType = returnType;
+        if (returnDescription) entry.returnDescription = returnDescription;
+        if (since) entry.since = since;
+        functions.set(functionName, entry);
     }
 }
 
@@ -155,9 +159,14 @@ console.log(`   ✓ Written to ${path.relative(process.cwd(), OUTPUT_FILE)}\n`);
 
 // Show some sample functions
 console.log('📋 Sample functions:');
-functionsArray.slice(0, 5).forEach((f) => {
-    console.log(`   - ${f.name}${f.since ? ` (since ${f.since})` : ''}`);
-    console.log(`     ${f.description}`);
-});
+const samples = ['get_option', 'wp_insert_post', 'add_action', 'the_title', 'get_permalink'];
+functionsArray
+    .filter((f) => samples.includes(f.name))
+    .forEach((f) => {
+        console.log(
+            `   - ${f.name}(${f.params.map((p) => (p.type ? `${p.type} $${p.name}` : `$${p.name}`)).join(', ')})${f.returnType ? ': ' + f.returnType : ''}`,
+        );
+        console.log(`     ${f.description.substring(0, 80)}`);
+    });
 
 console.log('\n✅ Done!');

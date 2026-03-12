@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Share;
+
 test('create a share', function () {
     $this->post('/share', [
         'code' => 'test-code',
@@ -70,7 +72,7 @@ test('create a share with plugins', function () {
     ]);
 
     // Verify plugins are stored as JSON
-    $share = \App\Models\Share::where('code', 'test-code-with-plugins')->first();
+    $share = Share::where('code', 'test-code-with-plugins')->first();
     expect($share->plugins)->toBe(['hello-dolly', 'akismet']);
 });
 
@@ -92,7 +94,7 @@ test('create a share with themes', function () {
     ]);
 
     // Verify themes are stored as JSON
-    $share = \App\Models\Share::where('code', 'test-code-with-themes')->first();
+    $share = Share::where('code', 'test-code-with-themes')->first();
     expect($share->themes)->toBe(['twentytwentyfour']);
 });
 
@@ -107,7 +109,7 @@ test('create a share with both plugins and themes', function () {
     ])
         ->assertRedirect();
 
-    $share = \App\Models\Share::where('code', 'test-code-with-both')->first();
+    $share = Share::where('code', 'test-code-with-both')->first();
     expect($share->plugins)->toBe(['hello-dolly']);
     expect($share->themes)->toBe(['twentytwentyfour']);
 });

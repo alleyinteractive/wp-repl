@@ -53,48 +53,48 @@ This means **no internet access is required** after the first run — the `.tmp/
 
 Each function entry (`php-functions.json`, `wordpress-functions.json`):
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | `string` | Function name, e.g. `array_map` |
-| `description` | `string` | Short description from PHPDoc |
-| `params` | `PhpParam[]` | Parameter list (see below) |
-| `returnType` | `string?` | PHP return type, e.g. `string\|false` |
-| `returnDescription` | `string?` | Return value description |
-| `docLink` | `string?` | URL to official docs |
-| `since` | `string?` | WordPress version *(WP only)* |
+| Field               | Type         | Description                           |
+| ------------------- | ------------ | ------------------------------------- |
+| `name`              | `string`     | Function name, e.g. `array_map`       |
+| `description`       | `string`     | Short description from PHPDoc         |
+| `params`            | `PhpParam[]` | Parameter list (see below)            |
+| `returnType`        | `string?`    | PHP return type, e.g. `string\|false` |
+| `returnDescription` | `string?`    | Return value description              |
+| `docLink`           | `string?`    | URL to official docs                  |
+| `since`             | `string?`    | WordPress version _(WP only)_         |
 
 ### Class schema
 
 Each class entry (`php-classes.json`, `wordpress-classes.json`):
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | `string` | Class name, e.g. `DOMDocument` |
-| `description` | `string` | Short description from PHPDoc |
-| `constructorParams` | `PhpParam[]` | `__construct` parameters |
-| `methods` | `PhpMethod[]` | Public instance + static methods |
-| `docLink` | `string?` | URL to official docs |
+| Field               | Type          | Description                      |
+| ------------------- | ------------- | -------------------------------- |
+| `name`              | `string`      | Class name, e.g. `DOMDocument`   |
+| `description`       | `string`      | Short description from PHPDoc    |
+| `constructorParams` | `PhpParam[]`  | `__construct` parameters         |
+| `methods`           | `PhpMethod[]` | Public instance + static methods |
+| `docLink`           | `string?`     | URL to official docs             |
 
 ### PhpParam schema
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | `string` | Parameter name (without `$`) |
-| `type` | `string?` | PHP type, e.g. `string`, `int\|false` |
-| `description` | `string?` | Parameter description |
-| `optional` | `boolean` | Whether the param has a default value |
+| Field         | Type      | Description                           |
+| ------------- | --------- | ------------------------------------- |
+| `name`        | `string`  | Parameter name (without `$`)          |
+| `type`        | `string?` | PHP type, e.g. `string`, `int\|false` |
+| `description` | `string?` | Parameter description                 |
+| `optional`    | `boolean` | Whether the param has a default value |
 
 ### PhpMethod schema
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | `string` | Method name |
-| `description` | `string` | Short description |
-| `params` | `PhpParam[]` | Parameter list |
-| `returnType` | `string?` | Return type |
-| `returnDescription` | `string?` | Return value description |
-| `docLink` | `string?` | URL to official docs |
-| `isStatic` | `boolean?` | Whether it's a static method |
+| Field               | Type         | Description                  |
+| ------------------- | ------------ | ---------------------------- |
+| `name`              | `string`     | Method name                  |
+| `description`       | `string`     | Short description            |
+| `params`            | `PhpParam[]` | Parameter list               |
+| `returnType`        | `string?`    | Return type                  |
+| `returnDescription` | `string?`    | Return value description     |
+| `docLink`           | `string?`    | URL to official docs         |
+| `isStatic`          | `boolean?`   | Whether it's a static method |
 
 ## Example Output
 
@@ -125,6 +125,7 @@ Each class entry (`php-classes.json`, `wordpress-classes.json`):
 ## When to Regenerate
 
 Regenerate the data files when:
+
 - A new major PHP or WordPress version is released
 - The upstream stub repositories are updated
 
@@ -184,4 +185,3 @@ classRegistry.register('vendor/package', packageClasses);
 - `parseParams(rawParams)` — splits a PHP parameter list string into objects
 - `extractParamSection(signature)` — balanced-parenthesis extraction of the param section
 - `extractReturnType(signature)` — extracts `: ReturnType` from after the closing `)`
-

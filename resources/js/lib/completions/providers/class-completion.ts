@@ -173,10 +173,7 @@ export function registerClassCompletionProvider(monaco: typeof Monaco): void {
                 kind: monaco.languages.CompletionItemKind.Class,
                 // WordPress class names follow the WP_ prefix convention; also catch
                 // lower-case conventions like Walker, Requests_* etc via their doc link origin.
-                detail:
-                    cls.name.startsWith('WP_') || cls.docLink?.startsWith('https://developer.wordpress.org/')
-                        ? 'WordPress class'
-                        : 'PHP class',
+                detail: cls.name.startsWith('WP_') || cls.docLink?.startsWith('https://developer.wordpress.org/') ? 'WordPress class' : 'PHP class',
                 documentation: buildClassMarkdown(cls),
                 insertText: buildConstructorSnippet(cls),
                 insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,

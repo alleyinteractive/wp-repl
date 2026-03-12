@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { stripHtml, parseDocBlock, parseParams, extractParamSection } = require('./lib/stubs-helpers.cjs');
+const { parseDocBlock, parseParams, extractParamSection } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/JetBrains/phpstorm-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/phpstorm-stubs');
@@ -139,8 +139,7 @@ function parseStubFile(filePath) {
         // Collect the full function signature (may span multiple lines)
         let fullSignature = trimmed;
         let j = i;
-        let parenDepth =
-            (fullSignature.match(/\(/g) || []).length - (fullSignature.match(/\)/g) || []).length;
+        let parenDepth = (fullSignature.match(/\(/g) || []).length - (fullSignature.match(/\)/g) || []).length;
         while (parenDepth > 0 && j < Math.min(i + 20, lines.length - 1)) {
             j++;
             const nextLine = lines[j].trim();
@@ -240,9 +239,7 @@ console.log(`   ✓ Written to ${path.relative(process.cwd(), OUTPUT_FILE)}\n`);
 
 // Show sample functions
 console.log('📋 Sample functions:');
-const samples = functionsArray.filter((f) =>
-    ['array_map', 'str_replace', 'json_encode', 'preg_match', 'sprintf'].includes(f.name),
-);
+const samples = functionsArray.filter((f) => ['array_map', 'str_replace', 'json_encode', 'preg_match', 'sprintf'].includes(f.name));
 samples.forEach((f) => {
     console.log(`   - ${f.name}(${f.params.map((p) => (p.type ? `${p.type} $${p.name}` : `$${p.name}`)).join(', ')})`);
     if (f.returnType) console.log(`     returns: ${f.returnType}`);

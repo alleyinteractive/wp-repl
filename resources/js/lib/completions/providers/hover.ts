@@ -2,9 +2,8 @@ import type * as Monaco from 'monaco-editor';
 
 import { classRegistry } from '../class-registry';
 import { completionRegistry } from '../registry';
-import { buildMethodMarkdown } from './class-completion';
-import { inferVariableClass } from './class-completion';
 import { buildHoverMarkdown } from '../utils';
+import { buildMethodMarkdown, inferVariableClass } from './class-completion';
 
 /**
  * Register a Monaco HoverProvider for the 'php' language.
@@ -95,7 +94,7 @@ export function registerHoverProvider(monaco: typeof Monaco): void {
             const fn = completionRegistry.getFunction(word.word);
             if (!fn) return null;
 
-            return { contents: [buildHoverMarkdown(fn, monaco)], range };
+            return { contents: [buildHoverMarkdown(fn)], range };
         },
     });
 }

@@ -24,7 +24,7 @@ export function registerCompletionProvider(monaco: typeof Monaco): void {
                     label: fn.name,
                     kind: monaco.languages.CompletionItemKind.Function,
                     detail,
-                    documentation: buildHoverMarkdown(fn, monaco),
+                    documentation: buildHoverMarkdown(fn),
                     insertText: buildSnippet(fn),
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                     range,

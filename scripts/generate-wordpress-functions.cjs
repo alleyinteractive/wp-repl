@@ -23,7 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { stripHtml, parseDocBlock, extractParamSection } = require('./lib/stubs-helpers.cjs');
+const { parseDocBlock, extractParamSection } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/php-stubs/wordpress-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/wordpress-stubs');

@@ -1,12 +1,12 @@
 import type * as Monaco from 'monaco-editor';
 
+import { registerClassCompletionProvider } from './providers/class-completion';
 import { registerCompletionProvider } from './providers/completion';
 import { registerHoverProvider } from './providers/hover';
 import { registerSignatureHelpProvider } from './providers/signature-help';
-import { registerClassCompletionProvider } from './providers/class-completion';
 import { registerPhpSource } from './sources/php';
-import { registerWordPressSource } from './sources/wordpress';
 import { registerPhpClassSource } from './sources/php-classes';
+import { registerWordPressSource } from './sources/wordpress';
 import { registerWordPressClassSource } from './sources/wordpress-classes';
 
 /**
@@ -44,6 +44,6 @@ export function setupCompletions(monaco: typeof Monaco): void {
     registerSignatureHelpProvider(monaco);
 }
 
-export { completionRegistry } from './registry';
 export { classRegistry } from './class-registry';
-export type { PhpFunction, PhpParam, PhpClass, PhpMethod } from './types';
+export { completionRegistry } from './registry';
+export type { PhpClass, PhpFunction, PhpMethod, PhpParam } from './types';

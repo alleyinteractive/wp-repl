@@ -31,9 +31,20 @@ const OUTPUT_FILE = path.join(__dirname, '../resources/js/data/wordpress-classes
 
 // Magic methods to skip as regular completions
 const SKIP_METHODS = new Set([
-    '__destruct', '__toString', '__serialize', '__unserialize',
-    '__sleep', '__wakeup', '__invoke', '__set_state', '__clone',
-    '__debugInfo', '__get', '__set', '__isset', '__unset',
+    '__destruct',
+    '__toString',
+    '__serialize',
+    '__unserialize',
+    '__sleep',
+    '__wakeup',
+    '__invoke',
+    '__set_state',
+    '__clone',
+    '__debugInfo',
+    '__get',
+    '__set',
+    '__isset',
+    '__unset',
 ]);
 
 console.log('🔧 WordPress Classes Generator\n');
@@ -109,9 +120,7 @@ for (let i = 0; i < lines.length; i++) {
     if (!currentClass) {
         // WordPress stubs wraps everything in namespace { }, so classes are at braceDepth=1
         // (class declarations appear after the namespace { has opened to depth 1)
-        const classMatch = trimmed.match(
-            /^(?:#\[[^\]]*\]\s*)*(?:(?:abstract|final|readonly)\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)/,
-        );
+        const classMatch = trimmed.match(/^(?:#\[[^\]]*\]\s*)*(?:(?:abstract|final|readonly)\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)/);
         if (classMatch) {
             const docLines = findDocBlock(i);
             const doc = docLines ? parseDocBlock(docLines) : {};
@@ -132,9 +141,7 @@ for (let i = 0; i < lines.length; i++) {
     }
 
     if (currentClass && braceDepth === currentClass.bodyDepth) {
-        const methodMatch = trimmed.match(
-            /^(?:(?:abstract|final|static|public|protected|private)\s+)*function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/,
-        );
+        const methodMatch = trimmed.match(/^(?:(?:abstract|final|static|public|protected|private)\s+)*function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/);
 
         if (methodMatch) {
             const methodName = methodMatch[1];

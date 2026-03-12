@@ -32,7 +32,7 @@ export function buildSignatureLabel(fn: PhpFunction): string {
 /**
  * Build the rich Markdown string shown in a hover tooltip for a function.
  */
-export function buildHoverMarkdown(fn: PhpFunction, monaco: typeof Monaco): Monaco.IMarkdownString {
+export function buildHoverMarkdown(fn: PhpFunction): Monaco.IMarkdownString {
     const lines: string[] = [];
 
     // Signature in a PHP code block

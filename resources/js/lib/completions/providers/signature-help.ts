@@ -2,9 +2,9 @@ import type * as Monaco from 'monaco-editor';
 
 import { classRegistry } from '../class-registry';
 import { completionRegistry } from '../registry';
-import { inferVariableClass } from './class-completion';
 import type { PhpMethod, PhpParam } from '../types';
 import { buildSignatureLabel } from '../utils';
+import { inferVariableClass } from './class-completion';
 
 /**
  * Build ParameterInformation objects from a param list.

@@ -22,7 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { stripHtml, parseDocBlock, parseParams, extractParamSection, extractReturnType } = require('./lib/stubs-helpers.cjs');
+const { parseDocBlock, parseParams, extractParamSection, extractReturnType } = require('./lib/stubs-helpers.cjs');
 
 const STUBS_REPO = 'https://github.com/JetBrains/phpstorm-stubs.git';
 const TEMP_DIR = path.join(__dirname, '../.tmp/phpstorm-stubs');
@@ -33,9 +33,20 @@ const SKIP_FILES = new Set(['StubsMap.php']);
 
 // Magic methods to skip as regular completions (keep __construct for constructor params)
 const SKIP_METHODS = new Set([
-    '__destruct', '__toString', '__serialize', '__unserialize',
-    '__sleep', '__wakeup', '__invoke', '__set_state', '__clone',
-    '__debugInfo', '__get', '__set', '__isset', '__unset',
+    '__destruct',
+    '__toString',
+    '__serialize',
+    '__unserialize',
+    '__sleep',
+    '__wakeup',
+    '__invoke',
+    '__set_state',
+    '__clone',
+    '__debugInfo',
+    '__get',
+    '__set',
+    '__isset',
+    '__unset',
 ]);
 
 console.log('🔧 PHP Native Classes Generator\n');
@@ -168,9 +179,7 @@ function parseStubFile(filePath) {
 
         // Look for class declaration when NOT already inside a class AND in global namespace
         if (!currentClass && inGlobalNamespace) {
-            const classMatch = trimmed.match(
-                /^(?:(?:abstract|final|readonly)\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)/,
-            );
+            const classMatch = trimmed.match(/^(?:(?:abstract|final|readonly)\s+)*class\s+([A-Za-z_][A-Za-z0-9_]*)/);
             if (classMatch) {
                 const docLines = findDocBlock(lines, i);
                 const doc = docLines ? parseDocBlock(docLines) : {};
@@ -188,9 +197,7 @@ function parseStubFile(filePath) {
 
         if (currentClass && braceDepth === currentClass.bodyDepth) {
             // Inside the class body at the direct member level.
-            const methodMatch = trimmed.match(
-                /^(?:(?:abstract|final|static|public|protected|private)\s+)*function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/,
-            );
+            const methodMatch = trimmed.match(/^(?:(?:abstract|final|static|public|protected|private)\s+)*function\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/);
 
             if (methodMatch) {
                 const methodName = methodMatch[1];

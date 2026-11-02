@@ -4,6 +4,22 @@ import { useEffect, useState } from 'react';
 
 const errorLogPath = '/wordpress/wp-content/debug.log';
 
+function LogLine({ log }: { log: string }) {
+    const match = /Error:|Fatal:/.exec(log);
+
+    if (!match) {
+        return log;
+    }
+
+    return (
+        <>
+            {log.slice(0, match.index)}
+            <mark>{match[0]}</mark>
+            {log.slice(match.index + match[0].length)}
+        </>
+    );
+}
+
 export function ConsolePanel({ className = '' }: { className?: string }) {
     const {
         state: { playgroundClient, ready },
@@ -37,13 +53,9 @@ export function ConsolePanel({ className = '' }: { className?: string }) {
             <h3 className="mb-3 text-lg font-semibold tracking-tight">Error Console</h3>
 
             {logs.map((log, index) => (
-                <div
-                    className="my-2 border-b border-dashed py-2 font-mono break-words whitespace-pre-wrap"
-                    key={index}
-                    dangerouslySetInnerHTML={{
-                        __html: log.replace(/Error:|Fatal:/, '<mark>$&</mark>'),
-                    }}
-                />
+                <div className="my-2 border-b border-dashed py-2 font-mono break-words whitespace-pre-wrap" key={index}>
+                    <LogLine log={log} />
+                </div>
             ))}
 
             {!logs.length ? (

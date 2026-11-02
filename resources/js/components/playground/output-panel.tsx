@@ -123,7 +123,7 @@ export function OutputPanel() {
                         className="h-full w-full overflow-auto bg-white px-3 pt-2"
                         srcDoc={output}
                         title="Output"
-                        sandbox="allow-same-origin allow-scripts"
+                        sandbox="allow-scripts"
                         style={{ border: 'none' }}
                         id="output-html"
                     />
